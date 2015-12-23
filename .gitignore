@@ -1,0 +1,24 @@
+### General Development Files and Directories ###
+dependencies/
+Debug/
+Release/
+ipch/
+vcprojectfiles/
+*.suo
+*.user
+*.opensdf
+
+cnconfig.hpp
+
+### Compilation and Intermediate Files ###
+bin/
+*.[oa]
+*.so
+*.sdf
+*.dll
+*.exe
+
+### OS Files ###
+*~
+*.DS_Store
+*.db
