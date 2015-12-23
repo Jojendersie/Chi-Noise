@@ -11,8 +11,8 @@ namespace cn {
     // In general they are initialized differently. For details see the generator
     // description.
     // The library uses duck-typing for generator objects to avoid virtual calls.
-    // Each object with the two functions ()->uint32 and (uint32)const->uint32 can be
-    // used as a generator.
+    // Each object with the functions ()->uint32 can be used as a generator and
+    // each with (uint32)const->uint32 as a hash function.
     // The argument-less function should return the next number in the sequence
     // whereas the constant mapping function does not change the internal state.
 
@@ -20,13 +20,18 @@ namespace cn {
     // sequence generators.
     // State-Size:
     // Period: 
-    class Xorshift32
+    class Xorshift32Rng
     {
         uint32 state;
     public:
-        Xorshift32(uint32 _seed);
+        Xorshift32Rng(uint32 _seed);
 
         uint32 operator () ();
+    };
+
+    class WangHash
+    {
+    public:
         uint32 operator () (uint32) const;
     };
 
