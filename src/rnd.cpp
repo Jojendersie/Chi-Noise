@@ -15,6 +15,30 @@ namespace cn {
         return state;
     }
 
+
+    HaltonRng::HaltonRng(uint32 _numBases) :
+        numBases(_numBases),
+        counter(numBases) // Skip all the 0 entries
+    {
+    }
+
+    uint32 HaltonRng::operator () ()
+    {
+        uint32 base = BASES[counter % numBases];
+        uint32 i = counter / numBases;
+        uint32 result = 0;
+        uint32 f = 0x100000000ull / base;
+        while(i > 0)
+        {
+            result += f * (i % base);
+            i /= base;
+            f /= base;
+        }
+        ++counter;
+        return result;
+    }
+
+
     uint32 WangHash::operator () (uint32 _x) const
     {
         _x = (_x ^ 61) ^ (_x >> 16);

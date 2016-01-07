@@ -18,13 +18,31 @@ namespace cn {
 
     // The xorshift generators are fast, well distributed pseudo-random
     // sequence generators.
-    // State-Size:
+    // State-Size: 4 Byte
     // Period: 
     class Xorshift32Rng
     {
         uint32 state;
     public:
         Xorshift32Rng(uint32 _seed);
+
+        uint32 operator () ();
+    };
+
+    // Low discrepancy pseudo-random sequence generator.
+    // This generator does not create (pseudo) independent sequences, instead
+    // it fills the sampling space evenly.
+    // However, using more than one base creates independent sequences which
+    // are sampled interleaved.
+    // State-Size: 8 Byte
+    class HaltonRng
+    {
+        uint32 numBases;
+        uint32 counter;
+        const int BASES[5] = {2, 3, 5, 7, 9};
+    public:
+        // _numBases: Number of interleaved independent sequences in [1,5].
+        HaltonRng(uint32 _numBases = 1);
 
         uint32 operator () ();
     };

@@ -1,13 +1,13 @@
 template<typename RndGen>
 float uniform(RndGen& _generator)
 {
-    return (_generator() & 0x00ffffff) / 16777215.0f;
+    return (_generator() >> 8) / 16777215.0f;
 }
 
 template<typename RndGen>
 float uniformEx(RndGen& _generator)
 {
-    return (_generator() & 0x00ffffff) / 16777216.0f;
+    return (_generator() >> 8) / 16777216.0f;
 }
 
 template<typename RndGen>
