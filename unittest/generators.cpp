@@ -28,6 +28,9 @@ float l2discrepancy1D(RndGen _generator, int N)
 
 void test_generators()
 {
+    // Xorshift
+    Xorshift32Rng xorshift32(WangHash()(83642));
+
     // Halton sequences
     HaltonRng halton;
     if(uniformEx(halton) != 0.5f)    std::cerr << "FAILED: 1. number of Halton sequence wrong.\n";
@@ -41,20 +44,20 @@ void test_generators()
     if(uniformEx(halton2) != 0.75f)    std::cerr << "FAILED: 5. number of Halton-2 sequence wrong.\n";
     if(!approx(uniformEx(halton2), 1.0f/9.0f))    std::cerr << "FAILED: 6. number of Halton-2 sequence wrong.\n";
 
-    // Xorshift
-    Xorshift32Rng xorshift32(WangHash()(83642));
-
     // *** L2 Discrepancy Test ***
-    /*const HaltonRng haltonStat;
     const Xorshift32Rng xorshift32Stat(WangHash()(83642));
-    std::cout << "L2-discrepancy of the Halton generator is: " << l2discrepancy1D(haltonStat, 10000) << '\n';
+    const HaltonRng haltonStat;
+    const AdditiveRecurrenceRng additiveStat;
     std::cout << "L2-discrepancy of the Xorshift32 generator is: " << l2discrepancy1D(xorshift32, 10000) << '\n';
+    std::cout << "L2-discrepancy of the Halton generator is: " << l2discrepancy1D(haltonStat, 10000) << '\n';
+    std::cout << "L2-discrepancy of the Additive Recurrence generator is: " << l2discrepancy1D(additiveStat, 10000) << '\n';
     std::ofstream file;
     file.open("test.csv");
     for(int i = 0; i < 1000; ++i)
     {
-        file << (i+1) << "; " << l2discrepancy1D(haltonStat, i+1) << "; "
-            << l2discrepancy1D(xorshift32Stat, i+1) << '\n';
+        file << (i+1) << "; " << l2discrepancy1D(xorshift32Stat, i+1) << "; "
+            << l2discrepancy1D(haltonStat, i+1) << "; "
+            << l2discrepancy1D(additiveStat, i+1) << '\n';
     }
-    file.close();*/
+    file.close();
 }

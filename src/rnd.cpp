@@ -39,6 +39,21 @@ namespace cn {
     }
 
 
+    AdditiveRecurrenceRng::AdditiveRecurrenceRng(uint32 _numBases) :
+        numBases(_numBases),
+        counter(0)
+    {
+    }
+
+    uint32 AdditiveRecurrenceRng::operator () ()
+    {
+        uint32 base = BASES[counter % numBases];
+        uint32 i = counter / numBases;
+        ++counter;
+        return base * i;
+    }
+
+
     uint32 WangHash::operator () (uint32 _x) const
     {
         _x = (_x ^ 61) ^ (_x >> 16);
