@@ -18,7 +18,7 @@ namespace cn {
 
     HaltonRng::HaltonRng(uint32 _numBases) :
         numBases(_numBases),
-        counter(numBases) // Skip all the 0 entries
+        counter(_numBases) // Skip all the 0 entries
     {
     }
 
@@ -27,7 +27,7 @@ namespace cn {
         uint32 base = BASES[counter % numBases];
         uint32 i = counter / numBases;
         uint32 result = 0;
-        uint32 f = 0x100000000ull / base;
+        uint32 f = uint32(0x100000000ull / base);
         while(i > 0)
         {
             result += f * (i % base);
