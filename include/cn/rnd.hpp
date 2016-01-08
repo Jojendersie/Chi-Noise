@@ -57,6 +57,9 @@ namespace cn {
     // State-Size: 4 Byte
     // Period: 
     // L2-Discrepancy 1D: 6.16e-3 / 1.12e-3 / 8.46e-5 / 4.92e-6
+    //                2D: 2.07e-3 / 1.25e-4 / 1.44e-5 / 1.51e-6
+    //                3D: 3.13e-4 / 3.01e-5 / 3.84e-6 / 4.27e-7
+    //                8D: 2.81e-8 / 5.39e-9 / 5.55e-10 / 5.83e-11
     class Xorshift32Rng
     {
         uint32 state;
@@ -69,6 +72,9 @@ namespace cn {
     // Medium speed Quasi-RNG.
     // State-Size: 4 Byte
     // L2-Discrepancy 1D: 2.59e-3 / 2.72e-5 / 2.79e-7 / 3.06e-9
+    //                2D: 1.27e-3 / 2.46e-5 / 5.21e-7 / 9.82-9
+    //                3D: 3.43e-4 / 1.20e-5 / 3.80e-7 / 9.59e-9
+    //                8D: 8.36e-8 / 4.89e-9 / 4.96e-10 / 3.88e-11
     class HaltonRng
     {
         uint32 numBases;
@@ -84,6 +90,9 @@ namespace cn {
     // Fast Quasi-RNG.
     // State-Size: 4 Byte
     // L2-Discrepancy 1D: 1.52e-3 / 2.35e-5 / 1.97e-7 / 3.81e-9
+    //                2D: 1.53e-3 / 3.29e-5 / 4.96e-7 / 3.30e-8
+    //                3D: 3.19e-4 / 1.31e-5 / 2.50e-6 / 3.52e-8
+    //                8D: 7.84e-8 / 5.30e-9 / 6.78e-10 / 1.67e-10
     class AdditiveRecurrenceRng
     {
         uint32 numBases;
