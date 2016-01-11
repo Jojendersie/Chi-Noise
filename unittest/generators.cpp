@@ -11,19 +11,19 @@ using namespace ei;
 // http://users.minet.uni-jena.de/~novak/NW.pdf
 // http://epubs.siam.org/doi/pdf/10.1137/0915077
 template<typename RndGen>
-float l2discrepancy1D(RndGen _generator, int N, int D)
+float l2discrepancy(RndGen _generator, int N, int D)
 {
     std::vector<float> samples(N*D);
-    for(int i = 0; i < N*D; ++i)
+    for(int i = 0; i < N; ++i)
         samples[i] = uniform(_generator);
     double a = 0.0, b = 0.0, prod;
-    for(int i = 0; i < N; ++i)
+    for(int i = 0; i < N/D; ++i)
     {
         prod = (1.0 - samples[i*D]) * samples[i*D];
         for(int d = 1; d < D; ++d)
             prod *= (1.0 - samples[i*D+d]) * samples[i*D+d];
         a += prod;
-        for(int j = 0; j < N; ++j)
+        for(int j = 0; j < N/D; ++j)
         {
             prod = (1.0 - max(samples[i*D], samples[j*D])) * min(samples[i*D], samples[j*D]);
             for(int d = 1; d < D; ++d)
@@ -58,11 +58,19 @@ void test_generators()
     const HaltonRng haltonStat(D);
     const AdditiveRecurrenceRng additiveStat(D);
     for(int i=10; i<=10000; i*=10)
-        std::cout << "L2-discrepancy of the Xorshift32 generator is: " << l2discrepancy1D(xorshift32, i, D) << '\n';
+        std::cout << "L2-discrepancy of the Xorshift32 generator is: " << l2discrepancy(xorshift32, i, D) << '\n';
     for(int i=10; i<=10000; i*=10)
-        std::cout << "L2-discrepancy of the Halton generator is: " << l2discrepancy1D(haltonStat, i, D) << '\n';
+        std::cout << "L2-discrepancy of the Halton generator is: " << l2discrepancy(haltonStat, i, D) << '\n';
     for(int i=10; i<=10000; i*=10)
-        std::cout << "L2-discrepancy of the Additive Recurrence generator is: " << l2discrepancy1D(additiveStat, i, D) << '\n';
+        std::cout << "L2-discrepancy of the Additive Recurrence generator is: " << l2discrepancy(additiveStat, i, D) << '\n';
+    const HammersleyRng hammersley10(D,10/D);
+    const HammersleyRng hammersley100(D,100/D);
+    const HammersleyRng hammersley1000(D,1000/D);
+    const HammersleyRng hammersley10000(D,10000/D);
+    std::cout << "L2-discrepancy of the Hammersley generator is: " << l2discrepancy(hammersley10, 10, D) << " / "
+        << l2discrepancy(hammersley100, 100, D) << " / "
+        << l2discrepancy(hammersley1000, 1000, D) << " / "
+        << l2discrepancy(hammersley10000, 10000, D) << '\n';
     /*std::ofstream file;
     file.open("test.csv");
     for(int i = 0; i < 1000; ++i)
@@ -73,9 +81,9 @@ void test_generators()
     }
     file.close();*/
 
-/*    std::ofstream file2;
+    /*std::ofstream file2;
     file2.open("test2.csv");
-    Xorshift32Rng dpointgen(2);
+    HammersleyRng dpointgen(2,1000);
     for(int i = 0; i < 1000; ++i)
         file2 << dpointgen() << "; " << dpointgen() << '\n';
     file2.close();*/

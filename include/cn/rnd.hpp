@@ -107,6 +107,33 @@ namespace cn {
         uint32 operator () ();
     };
 
+    // Medium speed Quasi-RNG. The Hammersley set is very similar to the Halton
+    // sequence. Only the first dimension differs as it is n/N. Thus, the number
+    // of samples must be known in advance.
+    // L2-Discrepancy 1D: 8.33e-4 / 8.33e-6 / 8.33e-8 / 8.33e-10
+    //                2D: 2.02e-3 / 1.73e-3 / 1.74e-3 / 1.74e-3  (? visually still really good)
+    //                3D: 2.85e-4 / 2.68e-4 / 2.58e-4 / 2.57e-4
+    //                8D: 2.33e-9 / 2.57e-9 / 1.84e-9 / 1.78e-9
+    class HammersleyRng
+    {
+        uint32 numBases;
+        uint32 numSamples;
+        uint32 counter;
+        const int BASES[8] = {0, 2, 3, 5, 7, 11, 13, 17};
+    public:
+        HammersleyRng(uint32 _numBases, uint32 _numSamples);
+
+        uint32 operator () ();
+    };
+
+    // http://www.deltaquants.com/sobol-sequence-simplified
+    // State-Size: 4*D Bytes
+    /*class SobolRng
+    {
+        uint32 state[8];
+
+    };*/
+
     class WangHash
     {
     public:

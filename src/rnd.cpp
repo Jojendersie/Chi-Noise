@@ -54,6 +54,33 @@ namespace cn {
     }
 
 
+    HammersleyRng::HammersleyRng(uint32 _numBases, uint32 _numSamples) :
+        numBases(_numBases),
+        numSamples(_numSamples),
+        counter(0)
+    {
+    }
+
+    uint32 HammersleyRng::operator () ()
+    {
+        uint32 base = BASES[counter % numBases];
+        uint32 i = counter++ / numBases;
+        // First dimension is n/N
+        if(base == 0)
+            return uint32((uint64(i) * (1ull<<32)) / numSamples);
+        // All others are Halton sequences
+        uint32 result = 0;
+        uint32 f = uint32(0x100000000ull / base);
+        while(i > 0)
+        {
+            result += f * (i % base);
+            i /= base;
+            f /= base;
+        }
+        return result;
+    }
+
+
     uint32 WangHash::operator () (uint32 _x) const
     {
         _x = (_x ^ 61) ^ (_x >> 16);
