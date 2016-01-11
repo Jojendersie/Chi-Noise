@@ -55,6 +55,8 @@ namespace cn {
     float value1D(RndGen& _generator, float _x, int _frequency, Interpolation _interp);
     template<typename RndGen>
     float value2D(RndGen& _generator, ei::Vec2 _x, int _frequency, Interpolation _interp);
+    template<typename RndGen>
+    float value3D(RndGen& _generator, ei::Vec3 _x, int _frequency, Interpolation _interp);
 
     // include template implementation
 #   include "details/fieldnoise.inl"
