@@ -26,37 +26,21 @@ namespace cn {
         CUBIC,          // Slowest, requires 4 samples in 1D but gives C2 smooth functions
     };
 
-    // Create a deterministic sample for an integer location.
-    /*class ISampleMapper
-    {
-    public:
-        virtual float operator () (uint32 _location) = 0;
-    };
-
-    // Default implementation for nearly any useful SampleMapper
-    template<typename RndGen>
-    class StdMapper : public ISampleMapper
-    {
-        RndGen& m_generator;
-        float (m_func*)(RndGen&);
-    public:
-        StdMapper(RndGen& _generator, float (_func*)(RndGen&)) :
-            m_generator(_generator),
-            m_func(_func)
-        {}
-
-        virtual float operator () (uint32 _location) override
-        {
-            return m_func(m_generator(_location));
-        }
-    };*/
-
     template<typename RndGen>
     float value1D(RndGen& _generator, float _x, int _frequency, Interpolation _interp);
     template<typename RndGen>
     float value2D(RndGen& _generator, ei::Vec2 _x, int _frequency, Interpolation _interp);
     template<typename RndGen>
     float value3D(RndGen& _generator, ei::Vec3 _x, int _frequency, Interpolation _interp);
+
+    // Improved Perlin Noise (Improving Noise, 2002, Ken Perlin)
+    // http://mrl.nyu.edu/~perlin/paper445.pdf
+    template<typename RndGen>
+    float perlin1D(RndGen& _generator, float _x, int _frequency, Interpolation _interp);
+    template<typename RndGen>
+    float perlin2D(RndGen& _generator, ei::Vec2 _x, int _frequency, Interpolation _interp);
+    template<typename RndGen>
+    float perlin3D(RndGen& _generator, ei::Vec3 _x, int _frequency, Interpolation _interp);
 
     // include template implementation
 #   include "details/fieldnoise.inl"
