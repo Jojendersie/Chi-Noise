@@ -18,3 +18,11 @@ ei::Vec3 direction(RndGen& _generator)
     float phi = uniform(_generator) * 2.0f * ei::PI;
     return ei::Vec3(sinTheta * sin(phi), sinTheta * cos(phi), cosTheta);
 }
+
+template<typename RndGen>
+ei::Vec2 disc(RndGen& _generator)
+{
+    float angle = _generator() * 1.46291808e-9f;
+    float radius = sqrt(uniform(_generator));
+    return ei::Vec2(sin(angle) * radius, cos(angle) * radius);
+}

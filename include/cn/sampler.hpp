@@ -18,6 +18,11 @@ namespace cn {
     template<typename RndGen>
     ei::Vec3 direction(RndGen& _generator);
 
+    // Get a uniform distributed sample on a unit disc area
+    // This generator consumes two samples.
+    template<typename RndGen>
+    ei::Vec2 disc(RndGen& _generator);
+
     // include inline implementation
 #   include "details/sampler.inl"
 
