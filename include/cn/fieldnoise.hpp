@@ -31,12 +31,14 @@ namespace cn {
 
     // Improved Perlin Noise (Improving Noise, 2002, Ken Perlin)
     // http://mrl.nyu.edu/~perlin/paper445.pdf
-    template<typename RndGen>
+    template<typename RndGen, int N>
+    float perlinNoise(RndGen& _generator, ei::Vec<float,N> _x, const ei::Vec<int,N>& _frequency, Interpolation _interp, uint32 _seed);
+    /*template<typename RndGen>
     float perlin1D(RndGen& _generator, float _x, int _frequency, Interpolation _interp);
     template<typename RndGen>
     float perlin2D(RndGen& _generator, ei::Vec2 _x, int _frequency, Interpolation _interp);
     template<typename RndGen>
-    float perlin3D(RndGen& _generator, ei::Vec3 _x, int _frequency, Interpolation _interp);
+    float perlin3D(RndGen& _generator, ei::Vec3 _x, int _frequency, Interpolation _interp);*/
 
     // include template implementation
 #   include "details/fieldnoise.inl"
