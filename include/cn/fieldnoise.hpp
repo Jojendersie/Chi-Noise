@@ -26,12 +26,8 @@ namespace cn {
         CUBIC,          // Slowest, requires 4 samples in 1D but gives C2 smooth functions
     };
 
-    template<typename RndGen>
-    float value1D(RndGen& _generator, float _x, int _frequency, Interpolation _interp);
-    template<typename RndGen>
-    float value2D(RndGen& _generator, ei::Vec2 _x, int _frequency, Interpolation _interp);
-    template<typename RndGen>
-    float value3D(RndGen& _generator, ei::Vec3 _x, int _frequency, Interpolation _interp);
+    template<typename RndGen, int N>
+    float valueNoise(RndGen& _generator, const ei::Vec<float,N>& _x, const ei::Vec<int,N>& _frequency, Interpolation _interp, uint32 _seed);
 
     // Improved Perlin Noise (Improving Noise, 2002, Ken Perlin)
     // http://mrl.nyu.edu/~perlin/paper445.pdf
