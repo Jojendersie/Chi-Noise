@@ -81,6 +81,11 @@ namespace cn {
     }
 
 
+    uint32 KnuthHash::operator () (uint32 _x) const
+    {
+        return _x * 2654435761;
+    }
+
     uint32 WangHash::operator () (uint32 _x) const
     {
         _x = (_x ^ 61) ^ (_x >> 16);
@@ -88,6 +93,25 @@ namespace cn {
         _x = _x ^ (_x >> 4);
         _x *= 0x27d4eb2d;
         _x = _x ^ (_x >> 15);
+        return _x;
+		// 2007 variant: https://gist.github.com/badboy/6267743
+		/*_x = ~_x + (_x << 15); // _x = (_x << 15) - _x - 1;
+		_x = _x ^ (_x >> 12);
+		_x = _x + (_x << 2);
+		_x = _x ^ (_x >> 4);
+		_x = _x * 2057; // _x = (_x + (_x << 3)) + (_x << 11);
+		_x = _x ^ (_x >> 16);
+		return _x;*/
+    }
+
+    uint32 JenkinsHash::operator () (uint32 _x) const
+    {
+        _x = (_x + 0x7ed55d16) + (_x << 12);
+        _x = (_x ^ 0xc761c23c) ^ (_x >> 19);
+        _x = (_x + 0x165667b1) + (_x << 5);
+        _x = (_x + 0xd3a2646c) ^ (_x << 9);
+        _x = (_x + 0xfd7046c5) + (_x << 3);
+        _x = (_x ^ 0xb55a4f09) ^ (_x >> 16);
         return _x;
     }
 

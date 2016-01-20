@@ -52,6 +52,15 @@ namespace cn {
     //      for infinitely many. Important is that it goes down faster. For that
     //      reason numbers are provided for N=10/100/1000/10000 samples.
     //      Lower is better.
+    //
+    // Avalanche: A test for the distribution of hash codes. Full avalanche
+    //      is reached if a change of any bit in the input causes each bit in
+    //      the output to be flipped with a probability of 0.5.
+    //      The scalar value computed here is one minus the average avalanche
+    //      deviation over all bits.
+    //      Since it is also interesting if avalanche is also reached for only
+    //      few samples, numbers are provided for 128, 1024 and 16384 samples.
+    //      1.00 is best.
 
     // The xorshift generators are fast, well distributed Pseudo-RNGs.
     // State-Size: 4 Byte
@@ -134,7 +143,27 @@ namespace cn {
 
     };*/
 
+    // Good sources for integer hash functions are:
+    // https://gist.github.com/badboy/6267743
+    // http://burtleburtle.net/bob/hash/integer.html
+
+    // Low quality but fast hash function (single multiplication)
+    // Avalanche: 0.25, 0.25, 0.25
+    class KnuthHash
+    {
+    public:
+        uint32 operator () (uint32) const;
+    };
+
+    // Avalanche: 0.82, 0.92, 0.97
     class WangHash
+    {
+    public:
+        uint32 operator () (uint32) const;
+    };
+
+    // Avalanche: 0.90, 0.94, 0.95
+    class JenkinsHash
     {
     public:
         uint32 operator () (uint32) const;
