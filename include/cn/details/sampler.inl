@@ -26,3 +26,18 @@ ei::Vec2 disc(RndGen& _generator)
     float radius = sqrt(uniform(_generator));
     return ei::Vec2(sin(angle) * radius, cos(angle) * radius);
 }
+
+template<typename RndGen>
+ei::Vec3 barycentric(RndGen& _generator)
+{
+	ei::Vec3 coord;
+	coord.x = uniform(_generator);
+	coord.y = uniform(_generator);
+	if(coord.x + coord.y > 1.0f)
+	{
+		coord.x = 1.0f - coord.x;
+		coord.y = 1.0f - coord.y;
+	}
+	coord.z = 1.0f - (coord.x + coord.y);
+	return coord;
+}

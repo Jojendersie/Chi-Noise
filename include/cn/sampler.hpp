@@ -23,6 +23,11 @@ namespace cn {
     template<typename RndGen>
     ei::Vec2 disc(RndGen& _generator);
 
+    // Create uniform barycentric coordinate sample in a triangle
+    // This generator consumes two samples.
+    template<typename RndGen>
+    ei::Vec3 barycentric(RndGen& _generator);
+
     // include inline implementation
 #   include "details/sampler.inl"
 
