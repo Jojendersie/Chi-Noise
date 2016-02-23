@@ -140,3 +140,60 @@ float perlinNoise(RndGen& _generator, ei::Vec<float,N> _x, const ei::Vec<int,N>&
     _x = -f; // _x is toGrid now
     return cndetails::perlinNoiseRec<RndGen, 0, N>(_generator, _x, ix, f, _interp, _seed) * 0.5f + 0.5f;
 }
+
+
+
+
+template<typename RndGen, typename GenFunc, int N>
+float stdTurbulence(RndGen& _generator, GenFunc _field, ei::Vec<float,N> _x, const ei::Vec<int,N>& _frequency, Interpolation _interp, uint32 _seed,
+                    int _octaves, float _frequenceMultiplier, float _amplitudeMultiplier)
+{
+    float sum = 0.0f;
+    ei::Vec<float, N> freq( _frequency );
+    float amplitude = 1.0f;
+    for(int i = 0; i < _octaves; ++i)
+    {
+        float val = _field(_generator, _x, ei::Vec<int, N>(freq), _interp, _seed);
+        sum += val * amplitude;
+        freq *= _frequenceMultiplier;
+        amplitude *= _amplitudeMultiplier;
+    }
+    // Normalize sum to [0,1]
+    return sum * (_amplitudeMultiplier - 1.0f) / (amplitude - 1.0f);
+}
+
+template<typename RndGen, typename GenFunc, int N>
+float billowyTurbulence(RndGen& _generator, GenFunc _field, ei::Vec<float,N> _x, const ei::Vec<int,N>& _frequency, Interpolation _interp, uint32 _seed,
+                    int _octaves, float _frequenceMultiplier, float _amplitudeMultiplier)
+{
+    float sum = 0.0f;
+    ei::Vec<float, N> freq( _frequency );
+    float amplitude = 1.0f;
+    for(int i = 0; i < _octaves; ++i)
+    {
+        float val = _field(_generator, _x, ei::Vec<int, N>(freq), _interp, _seed);
+        sum += abs(val * 2.0f - 1.0f) * amplitude;
+        freq *= _frequenceMultiplier;
+        amplitude *= _amplitudeMultiplier;
+    }
+    // Normalize sum to [0,1]
+    return sum * (_amplitudeMultiplier - 1.0f) / (amplitude - 1.0f);
+}
+
+template<typename RndGen, typename GenFunc, int N>
+float ridgedTurbulence(RndGen& _generator, GenFunc _field, ei::Vec<float,N> _x, const ei::Vec<int,N>& _frequency, Interpolation _interp, uint32 _seed,
+                    int _octaves, float _frequenceMultiplier, float _amplitudeMultiplier)
+{
+    float sum = 0.0f;
+    ei::Vec<float, N> freq( _frequency );
+    float amplitude = 1.0f;
+    for(int i = 0; i < _octaves; ++i)
+    {
+        float val = _field(_generator, _x, ei::Vec<int, N>(freq), _interp, _seed);
+        sum += (1.0f - abs(val * 2.0f - 1.0f)) * amplitude;
+        freq *= _frequenceMultiplier;
+        amplitude *= _amplitudeMultiplier;
+    }
+    // Normalize sum to [0,1]
+    return sum * (_amplitudeMultiplier - 1.0f) / (amplitude - 1.0f);
+}

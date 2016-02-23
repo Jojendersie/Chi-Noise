@@ -5,17 +5,22 @@
 
 namespace cn {
 
-    // Field noises are static n-D random patterns, where a sample at the same
+    // Noise fields are static n-D random patterns, where a sample at the same
     // location always yields the same result.
-    // All field noises provided by this header are periodic on the interval [0,1].
+    // All noise fields provided by this header are periodic on the interval [0,1].
     // All field generators use the same syntax:
-    // <name><x>D(generator, location, frequency, interpolation)
+    // <name>Noise(generator, location, frequency, interpolation)
     // generator: A functor to get random values for arbitrary integer locations.
     //      The generator must implement the 'operator () (uint32)'.
     // location: D-dimensional coordinate (sample input location)
     // frequency: Number of random samples in the [0,1] interval.
     // interpolation: Value from Interpolation enumeration to determine the
     //      interpolation between the random samples.
+    //
+    // A generator itself generates coherent (often band limited) noise. To get
+    // the typical fractal noise (often refered as fBm - fractal Brownian motion)
+    // use the turbulence functions. These take a field generator and a number of
+    // octaves to generate the fractal noise.
 
     enum class Interpolation
     {
@@ -29,16 +34,27 @@ namespace cn {
     template<typename RndGen, int N>
     float valueNoise(RndGen& _generator, const ei::Vec<float,N>& _x, const ei::Vec<int,N>& _frequency, Interpolation _interp, uint32 _seed);
 
-    // Improved Perlin Noise (Improving Noise, 2002, Ken Perlin)
-    // http://mrl.nyu.edu/~perlin/paper445.pdf
+    // Gradient noise. This is inspired by Improved Perlin Noise (Improving
+    // Noise, 2002, Ken Perlin, http://mrl.nyu.edu/~perlin/paper445.pdf) but
+    // no direct implementation. In this implementation gradient vectors are
+    // generated randomly instead of chosen through permutation tables.
+    // This was done to allow the N-dimensional generalization.
     template<typename RndGen, int N>
     float perlinNoise(RndGen& _generator, ei::Vec<float,N> _x, const ei::Vec<int,N>& _frequency, Interpolation _interp, uint32 _seed);
-    /*template<typename RndGen>
-    float perlin1D(RndGen& _generator, float _x, int _frequency, Interpolation _interp);
-    template<typename RndGen>
-    float perlin2D(RndGen& _generator, ei::Vec2 _x, int _frequency, Interpolation _interp);
-    template<typename RndGen>
-    float perlin3D(RndGen& _generator, ei::Vec3 _x, int _frequency, Interpolation _interp);*/
+
+    // Sum octaves of increasing frequencies with decreasing amplitudes.
+    template<typename RndGen, typename GenFunc, int N>
+    float stdTurbulence(RndGen& _generator, GenFunc _field, ei::Vec<float,N> _x, const ei::Vec<int,N>& _frequency, Interpolation _interp, uint32 _seed,
+                        int _octaves, float _frequenceMultiplier = 1.92f, float _amplitudeMultiplier = 0.5f);
+
+    template<typename RndGen, typename GenFunc, int N>
+    float billowyTurbulence(RndGen& _generator, GenFunc _field, ei::Vec<float,N> _x, const ei::Vec<int,N>& _frequency, Interpolation _interp, uint32 _seed,
+        int _octaves, float _frequenceMultiplier = 1.92f, float _amplitudeMultiplier = 0.5f);
+
+    template<typename RndGen, typename GenFunc, int N>
+    float ridgedTurbulence(RndGen& _generator, GenFunc _field, ei::Vec<float,N> _x, const ei::Vec<int,N>& _frequency, Interpolation _interp, uint32 _seed,
+        int _octaves, float _frequenceMultiplier = 1.92f, float _amplitudeMultiplier = 0.5f);
+
 
     // include template implementation
 #   include "details/fieldnoise.inl"
