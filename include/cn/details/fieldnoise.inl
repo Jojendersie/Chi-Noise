@@ -28,7 +28,7 @@ float valueNoise(RndGen& _generator, const ei::Vec<float,N>& _x, const ei::Vec<i
         else if(_interp == cn::Interpolation::SMOOTHERSTEP) f = ei::smootherstep(f);
         ix = ei::mod(ix, _frequency[N-1]);
         return ei::lerp(
-            valueNoise(_generator, _x.subcol<0,N-1>(), _frequency.subcol<0,N-1>(), _interp, _generator(_seed ^ ei::mod(ix, _frequency[N-1]))),
+            valueNoise(_generator, _x.subcol<0,N-1>(), _frequency.subcol<0,N-1>(), _interp, _generator(_seed ^ ix)),
             valueNoise(_generator, _x.subcol<0,N-1>(), _frequency.subcol<0,N-1>(), _interp, _generator(_seed ^ ei::mod(ix+1, _frequency[N-1]))),
             f );
     }
@@ -108,17 +108,17 @@ namespace cndetails {
         switch(_interp)
         {
         case cn::Interpolation::POINT:
-            return perlinNoiseRec<RndGen, N, NMAX>(_generator, _toGrid, _ix, _frequency, _f, _interp, _seed ^ _generator(_ix[N]));
+            return perlinNoiseRec<RndGen, N, NMAX>(_generator, _toGrid, _ix, _frequency, _f, _interp, _generator(_seed ^ _ix[N]));
         case cn::Interpolation::LINEAR:
         case cn::Interpolation::SMOOTHSTEP:
         case cn::Interpolation::SMOOTHERSTEP: {
             float t = _f[N];
             if(_interp == cn::Interpolation::SMOOTHSTEP) t = ei::smoothstep(t);
             else if(_interp == cn::Interpolation::SMOOTHERSTEP) t = ei::smootherstep(t);
-            float s0 = perlinNoiseRec<RndGen, N+1, NMAX>(_generator, _toGrid, _ix, _frequency, _f, _interp, _seed ^ _generator(_ix[N]));
+            float s0 = perlinNoiseRec<RndGen, N+1, NMAX>(_generator, _toGrid, _ix, _frequency, _f, _interp, _generator(_seed ^ _ix[N]));
             _ix[N] = (_ix[N] + 1) % _frequency[N];
             _toGrid[N] = 1.0f-_f[N];
-            float s1 = perlinNoiseRec<RndGen, N+1, NMAX>(_generator, _toGrid, _ix, _frequency, _f, _interp, _seed ^ _generator(_ix[N]));
+            float s1 = perlinNoiseRec<RndGen, N+1, NMAX>(_generator, _toGrid, _ix, _frequency, _f, _interp, _generator(_seed ^ _ix[N]));
             return ei::lerp(s0, s1, t);
         }
         case cn::Interpolation::CUBIC: {

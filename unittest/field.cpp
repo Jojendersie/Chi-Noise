@@ -55,8 +55,8 @@ void test_fields()
     for(int y = 0; y < 512; ++y) for(int x = 0; x < 512; ++x)
     {
         //image[x + y*512] = stdTurbulence(hasher, perlinNoise<WangHash,2>, ei::Vec2(x / 512.0f, y / 512.0f), ei::IVec2(4), Interpolation::SMOOTHERSTEP, 29368, 4);
-        image[x + y*512] = billowyTurbulence(hasher, perlinNoise<WangHash,2>, ei::Vec2(x / 512.0f, y / 512.0f), ei::IVec2(4), Interpolation::SMOOTHERSTEP, 29368, 4);
-        //image[x + y*512] = ridgedTurbulence(hasher, perlinNoise<WangHash,2>, ei::Vec2(x / 512.0f, y / 512.0f), ei::IVec2(4), Interpolation::SMOOTHERSTEP, 29368, 4);
+        //image[x + y*512] = billowyTurbulence(hasher, perlinNoise<WangHash,2>, ei::Vec2(x / 512.0f, y / 512.0f), ei::IVec2(4), Interpolation::SMOOTHERSTEP, 29368, 4);
+        image[x + y*512] = ridgedTurbulence(hasher, perlinNoise<WangHash,2>, ei::Vec2(x / 512.0f, y / 512.0f), ei::IVec2(4), Interpolation::SMOOTHERSTEP, 29368, 4);
     }
     // "Shade the hills"
     std::vector<float> image2(512 * 512);
@@ -71,6 +71,6 @@ void test_fields()
         image2[x + y*512] = (0.5f + pseudoGrad * 10.0f) * image[x + y*512] * 2.0f;
     }
     //writePFM("stdTurbulence4_perlin.pfm", 512, image2.data());
-    writePFM("billowyTurbulence4_perlin.pfm", 512, image2.data());
-    //writePFM("ridgedTurbulence4_perlin.pfm", 512, image2.data());
+    //writePFM("billowyTurbulence4_perlin.pfm", 512, image2.data());
+    writePFM("ridgedTurbulence4_perlin.pfm", 512, image2.data());
 }
