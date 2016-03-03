@@ -28,7 +28,8 @@ namespace cn {
         LINEAR,         // 2 sample linear interpolation
         SMOOTHSTEP,     // 2 sample interpolation using smoothstep() on the interpolation value
         SMOOTHERSTEP,   // 2 sample interpolation using smootherstep() on the interpolation value
-        CUBIC,          // Slowest, requires 4 samples in 1D but gives C2 smooth functions
+        COSINE,         // 2 sample interpolation using 0.5-0.5 cos(t) on the interpolation value
+        //CUBIC,          // Slowest, requires 4 samples in 1D but gives C2 smooth functions
     };
 
     template<typename RndGen, int N>
