@@ -88,7 +88,7 @@ namespace cn {
     {
         uint32 numBases;
         uint32 counter;
-        const int BASES[8] = {2, 3, 5, 7, 11, 13, 17, 19};
+        static const int BASES[8];
     public:
         // _numBases: Number of interleaved independent sequences in [1,8].
         HaltonRng(uint32 _numBases = 1);
@@ -107,8 +107,7 @@ namespace cn {
         uint32 numBases;
         uint32 counter;
         // Bases are computed as (2^32-1) * frac(sqrt(<Prime>))
-        const uint32 BASES[8] = {2654435769, 1779033704, 3144134277, 1013904243,
-                                 2773480762, 1359893119, 2600822924,  528734636};
+        static const uint32 BASES[8];
     public:
         // _numBases: Number of interleaved independent sequences in [1,8].
         AdditiveRecurrenceRng(uint32 _numBases = 1);
@@ -128,7 +127,7 @@ namespace cn {
         uint32 numBases;
         uint32 numSamples;
         uint32 counter;
-        const int BASES[8] = {0, 2, 3, 5, 7, 11, 13, 17};
+        static const int BASES[8];
     public:
         HammersleyRng(uint32 _numBases, uint32 _numSamples);
 

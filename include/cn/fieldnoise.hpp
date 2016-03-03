@@ -41,17 +41,20 @@ namespace cn {
     // This was done to allow the N-dimensional generalization.
     template<typename RndGen, int N>
     float perlinNoise(RndGen& _generator, ei::Vec<float,N> _x, const ei::Vec<int,N>& _frequency, Interpolation _interp, uint32 _seed);
+    // The perlinNoiseG returns an additional vector with all partial derivatives.
+    //template<typename RndGen, int N>
+    //float perlinNoiseG(RndGen& _generator, ei::Vec<float,N> _x, const ei::Vec<int,N>& _frequency, Interpolation _interp, uint32 _seed, ei::Vec<float,N>& _derivative);
 
     // Sum octaves of increasing frequencies with decreasing amplitudes.
-    template<typename RndGen, typename GenFunc, int N>
+    template<typename RndGen, int N, typename GenFunc>
     float stdTurbulence(RndGen& _generator, GenFunc _field, ei::Vec<float,N> _x, const ei::Vec<int,N>& _frequency, Interpolation _interp, uint32 _seed,
                         int _octaves, float _frequenceMultiplier = 1.92f, float _amplitudeMultiplier = 0.5f);
 
-    template<typename RndGen, typename GenFunc, int N>
+    template<typename RndGen, int N, typename GenFunc>
     float billowyTurbulence(RndGen& _generator, GenFunc _field, ei::Vec<float,N> _x, const ei::Vec<int,N>& _frequency, Interpolation _interp, uint32 _seed,
         int _octaves, float _frequenceMultiplier = 1.92f, float _amplitudeMultiplier = 0.5f);
 
-    template<typename RndGen, typename GenFunc, int N>
+    template<typename RndGen, int N, typename GenFunc>
     float ridgedTurbulence(RndGen& _generator, GenFunc _field, ei::Vec<float,N> _x, const ei::Vec<int,N>& _frequency, Interpolation _interp, uint32 _seed,
         int _octaves, float _frequenceMultiplier = 1.92f, float _amplitudeMultiplier = 0.5f);
 

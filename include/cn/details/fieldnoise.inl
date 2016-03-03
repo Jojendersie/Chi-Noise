@@ -128,6 +128,7 @@ namespace cndetails {
         }
         return 0.0f;
     }
+
 }
 
 template<typename RndGen, int N>
@@ -144,7 +145,8 @@ float perlinNoise(RndGen& _generator, ei::Vec<float,N> _x, const ei::Vec<int,N>&
 
 
 
-template<typename RndGen, typename GenFunc, int N>
+
+template<typename RndGen, int N, typename GenFunc>
 float stdTurbulence(RndGen& _generator, GenFunc _field, ei::Vec<float,N> _x, const ei::Vec<int,N>& _frequency, Interpolation _interp, uint32 _seed,
                     int _octaves, float _frequenceMultiplier, float _amplitudeMultiplier)
 {
@@ -162,7 +164,7 @@ float stdTurbulence(RndGen& _generator, GenFunc _field, ei::Vec<float,N> _x, con
     return sum * (_amplitudeMultiplier - 1.0f) / (amplitude - 1.0f);
 }
 
-template<typename RndGen, typename GenFunc, int N>
+template<typename RndGen, int N, typename GenFunc>
 float billowyTurbulence(RndGen& _generator, GenFunc _field, ei::Vec<float,N> _x, const ei::Vec<int,N>& _frequency, Interpolation _interp, uint32 _seed,
                     int _octaves, float _frequenceMultiplier, float _amplitudeMultiplier)
 {
@@ -180,7 +182,7 @@ float billowyTurbulence(RndGen& _generator, GenFunc _field, ei::Vec<float,N> _x,
     return sum * (_amplitudeMultiplier - 1.0f) / (amplitude - 1.0f);
 }
 
-template<typename RndGen, typename GenFunc, int N>
+template<typename RndGen, int N, typename GenFunc>
 float ridgedTurbulence(RndGen& _generator, GenFunc _field, ei::Vec<float,N> _x, const ei::Vec<int,N>& _frequency, Interpolation _interp, uint32 _seed,
                     int _octaves, float _frequenceMultiplier, float _amplitudeMultiplier)
 {

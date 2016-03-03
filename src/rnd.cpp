@@ -16,6 +16,8 @@ namespace cn {
     }
 
 
+    const int HaltonRng::BASES[8] = {2, 3, 5, 7, 11, 13, 17, 19};
+
     HaltonRng::HaltonRng(uint32 _numBases) :
         numBases(_numBases),
         counter(_numBases) // Skip all the 0 entries
@@ -39,6 +41,11 @@ namespace cn {
     }
 
 
+    // Bases are computed as (2^32-1) * frac(sqrt(<Prime>))
+    const uint32 AdditiveRecurrenceRng::BASES[8] = {
+                                2654435769, 1779033704, 3144134277, 1013904243,
+                                2773480762, 1359893119, 2600822924,  528734636};
+
     AdditiveRecurrenceRng::AdditiveRecurrenceRng(uint32 _numBases) :
         numBases(_numBases),
         counter(0)
@@ -53,6 +60,8 @@ namespace cn {
         return base * i;
     }
 
+
+    const int HammersleyRng::BASES[8] = {0, 2, 3, 5, 7, 11, 13, 17};
 
     HammersleyRng::HammersleyRng(uint32 _numBases, uint32 _numSamples) :
         numBases(_numBases),

@@ -31,7 +31,7 @@ void test_fields()
     WangHash hasher;
 
     // Range tests
-   /* float vMin = 1.0f, vMax = 0.0f;
+    /*float vMin = 1.0f, vMax = 0.0f;
     float pMin = 1.0f, pMax = 0.0f;
     for(float z = 0.0f; z <= 1.0f; z += 0.01f)
         for(float y = 0.0f; y <= 1.0f; y += 0.01f)
@@ -48,15 +48,15 @@ void test_fields()
                 eiAssert(val >= 0.0f && val <= 1.0f, "Perlin noise out of range!");
             }
     std::cout << "Value noise range in [" << vMin << ", " << vMax << "]\n";
-    std::cout << "Perlin noise range in [" << pMin << ", " << pMax << "]\n";*/
+    std::cout << "Perlin noise range in [" << pMin << ", " << pMax << "]\n";//*/
 
     // Visual tests
     std::vector<float> image(512 * 512);
     for(int y = 0; y < 512; ++y) for(int x = 0; x < 512; ++x)
     {
-        //image[x + y*512] = stdTurbulence(hasher, perlinNoise<WangHash,2>, ei::Vec2(x / 512.0f, y / 512.0f), ei::IVec2(4), Interpolation::SMOOTHERSTEP, 29368, 4);
-        //image[x + y*512] = billowyTurbulence(hasher, perlinNoise<WangHash,2>, ei::Vec2(x / 512.0f, y / 512.0f), ei::IVec2(4), Interpolation::SMOOTHERSTEP, 29368, 4);
-        image[x + y*512] = ridgedTurbulence(hasher, perlinNoise<WangHash,2>, ei::Vec2(x / 512.0f, y / 512.0f), ei::IVec2(4), Interpolation::SMOOTHERSTEP, 29368, 4);
+        //image[x + y*512] = stdTurbulence(hasher, perlinNoise<WangHash,2>, ei::Vec2(x / 512.0f, y / 512.0f), ei::IVec2(4), Interpolation::SMOOTHERSTEP, 29368, 6);
+        image[x + y*512] = billowyTurbulence(hasher, perlinNoise<WangHash,2>, ei::Vec2(x / 512.0f, y / 512.0f), ei::IVec2(4), Interpolation::SMOOTHERSTEP, 29368, 6);
+        //image[x + y*512] = ridgedTurbulence(hasher, perlinNoise<WangHash,2>, ei::Vec2(x / 512.0f, y / 512.0f), ei::IVec2(4), Interpolation::SMOOTHERSTEP, 29368, 6);
     }
     // "Shade the hills"
     std::vector<float> image2(512 * 512);
@@ -71,6 +71,6 @@ void test_fields()
         image2[x + y*512] = (0.5f + pseudoGrad * 10.0f) * image[x + y*512] * 2.0f;
     }
     //writePFM("stdTurbulence4_perlin.pfm", 512, image2.data());
-    //writePFM("billowyTurbulence4_perlin.pfm", 512, image2.data());
-    writePFM("ridgedTurbulence4_perlin.pfm", 512, image2.data());
+    writePFM("billowyTurbulence4_perlin.pfm", 512, image2.data());
+    //writePFM("ridgedTurbulence4_perlin.pfm", 512, image2.data());
 }
