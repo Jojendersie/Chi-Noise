@@ -42,9 +42,10 @@ namespace cn {
     // This was done to allow the N-dimensional generalization.
     template<typename RndGen, int N>
     float perlinNoise(RndGen& _generator, ei::Vec<float,N> _x, const ei::Vec<int,N>& _frequency, Interpolation _interp, uint32 _seed);
-    // The perlinNoiseG returns an additional vector with all partial derivatives.
-    //template<typename RndGen, int N>
-    //float perlinNoiseG(RndGen& _generator, ei::Vec<float,N> _x, const ei::Vec<int,N>& _frequency, Interpolation _interp, uint32 _seed, ei::Vec<float,N>& _derivative);
+    // The perlinNoiseG returns an additional vector with the gradient vector
+    // (all partial derivatives).
+    template<typename RndGen, int N>
+    float perlinNoiseG(RndGen& _generator, ei::Vec<float,N> _x, const ei::Vec<int,N>& _frequency, Interpolation _interp, uint32 _seed, ei::Vec<float,N>& _gradient);
 
     // Sum octaves of increasing frequencies with decreasing amplitudes.
     template<typename RndGen, int N, typename GenFunc>

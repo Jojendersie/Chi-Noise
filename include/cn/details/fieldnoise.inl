@@ -88,9 +88,48 @@ namespace cndetails {
     {
         return 0.0f; // TODO
     }
-}
 
-namespace cndetails {
+    template<int N>
+    inline ei::Vec<float, N> grad(uint32 _hash, const ei::Vec<float,N>&) { return ei::Vec<float, N>(0.0f); }
+
+    inline float grad(uint32 _hash, const ei::Vec<float,1>&)
+    {
+        return ((_hash & 0x00ffffff) / 16777215.0f) * 2.0f - 1.0f;
+    }
+
+    inline ei::Vec2 grad(uint32 _hash, const ei::Vec<float,2>&)
+    {
+        float angle = _hash * 1.46291808e-9f;
+        return ei::Vec2(sin(angle), cos(angle)) * 1.414213562f;
+    }
+
+    inline ei::Vec3 grad(uint32 _hash, const ei::Vec<float,3>&)
+    {
+        _hash ^= _hash >> 4;
+        _hash ^= _hash >> 8;
+        _hash ^= _hash >> 16;
+        switch(_hash & 0xf)
+        {
+        case 0x0: return ei::Vec3( 1.0f,  1.0f,  0.0f);
+        case 0x1: return ei::Vec3(-1.0f,  1.0f,  0.0f);
+        case 0x2: return ei::Vec3( 1.0f, -1.0f,  0.0f);
+        case 0x3: return ei::Vec3(-1.0f, -1.0f,  0.0f);
+        case 0x4: return ei::Vec3( 1.0f,  0.0f,  1.0f);
+        case 0x5: return ei::Vec3(-1.0f,  0.0f,  1.0f);
+        case 0x6: return ei::Vec3( 1.0f,  0.0f, -1.0f);
+        case 0x7: return ei::Vec3(-1.0f,  0.0f, -1.0f);
+        case 0x8: return ei::Vec3( 0.0f,  1.0f,  1.0f);
+        case 0x9: return ei::Vec3( 0.0f, -1.0f,  1.0f);
+        case 0xa: return ei::Vec3( 0.0f,  1.0f, -1.0f);
+        case 0xb: return ei::Vec3( 0.0f, -1.0f, -1.0f);
+        case 0xc: return ei::Vec3( 1.0f,  1.0f,  0.0f);
+        case 0xd: return ei::Vec3( 0.0f, -1.0f,  1.0f);
+        case 0xe: return ei::Vec3(-1.0f,  1.0f,  0.0f);
+        case 0xf: return ei::Vec3( 0.0f, -1.0f, -1.0f);
+        }
+        return ei::Vec3(0.0f); // impossible case
+    }
+
 
     template<typename RndGen, int N, int NMAX>
     static inline typename std::enable_if<N==NMAX, float>::type perlinNoiseRec(RndGen& _generator, ei::Vec<float,NMAX> _toGrid, ei::Vec<int,NMAX> _ix, uint32 _seed)
@@ -120,6 +159,34 @@ namespace cndetails {
         return ei::lerp(s0, s1, _f[N]);
     }
 
+
+    // _wa: product off all interpolation weights
+    // _f interpolation factors
+    // _df: derivative of f
+    template<typename RndGen, int N, int NMAX>
+    static inline typename std::enable_if<N==NMAX, float>::type perlinNoiseRecG(RndGen& _generator, ei::Vec<float,NMAX> _toGrid, ei::Vec<int,NMAX> _ix, const ei::Vec<int,NMAX>& _frequency, const ei::Vec<float,NMAX>& _f, const ei::Vec<float,NMAX>& _df, uint32 _seed, ei::Vec<float,NMAX>& _gradient, float _wa)
+    {
+        ei::Vec<float,NMAX> g( grad(_generator(_seed), _toGrid) );
+        float v = dot(_toGrid, g);
+        for(int i = 0; i < N; ++i)
+            if(_toGrid[i] < 0.0f)
+                _gradient[i] -= (v * _df[i] + g[i] * (1.0f - _f[i])) * (_wa / (1.0f - _f[i]));
+            else
+                _gradient[i] += (v * _df[i] - g[i] * _f[i]) * (_wa / _f[i]);
+        return v;
+    }
+
+    template<typename RndGen, int N, int NMAX>
+    static inline typename std::enable_if<N<NMAX, float>::type perlinNoiseRecG(RndGen& _generator, ei::Vec<float,NMAX> _toGrid, ei::Vec<int,NMAX> _ix, const ei::Vec<int,NMAX>& _frequency, const ei::Vec<float,NMAX>& _f, const ei::Vec<float,NMAX>& _df, uint32 _seed, ei::Vec<float,NMAX>& _gradient, float _wa)
+    {
+        float w0 = 1.0f - _f[N];
+        float w1 = _f[N];
+        float s0 = perlinNoiseRecG<RndGen, N+1, NMAX>(_generator, _toGrid, _ix, _frequency, _f, _df, _generator(_seed ^ _ix[N]), _gradient, _wa * w0);
+        _ix[N] = (_ix[N] + 1) % _frequency[N];
+        _toGrid[N] += 1.0f;
+        float s1 = perlinNoiseRecG<RndGen, N+1, NMAX>(_generator, _toGrid, _ix, _frequency, _f, _df, _generator(_seed ^ _ix[N]), _gradient, _wa * w1);
+        return w0 * s0 + w1 * s1;
+    }
 }
 
 template<typename RndGen, int N>
@@ -145,7 +212,47 @@ float perlinNoise(RndGen& _generator, ei::Vec<float,N> _x, const ei::Vec<int,N>&
     }
     if(_interp == cn::Interpolation::POINT)
         return cndetails::perlinNoiseRec<RndGen, 0, N>(_generator, _x, ix, _seed);
-    return cndetails::perlinNoiseRec<RndGen, 0, N>(_generator, _x, ix, _frequency, f, _seed) * 0.5f + 0.5f;
+    else
+        return cndetails::perlinNoiseRec<RndGen, 0, N>(_generator, _x, ix, _frequency, f, _seed) * 0.5f + 0.5f;
+}
+
+template<typename RndGen, int N>
+float perlinNoiseG(RndGen& _generator, ei::Vec<float,N> _x, const ei::Vec<int,N>& _frequency, Interpolation _interp, uint32 _seed, ei::Vec<float,N>& _gradient)
+{
+    _x *= _frequency;
+    ei::Vec<int, N> ix = ei::floor(_x);
+    ei::Vec<float, N> f = _x - ix;
+    ei::Vec<float, N> df;
+    ix = ei::mod(ix, _frequency);
+    _x = -f; // _x is toGrid now
+    for(int i = 0; i < N; ++i) _gradient[i] = 0.0f;
+    // Modify linear interpolation value to make function smoother
+    switch(_interp)
+    {
+        case cn::Interpolation::SMOOTHSTEP:
+            for(int i = 0; i < N; ++i) {
+                df[i] = 6.0f * f[i] * (1.0f - f[i]);
+                f[i] = ei::smoothstep(f[i]);
+            }
+            break;
+        case cn::Interpolation::SMOOTHERSTEP:
+               for(int i = 0; i < N; ++i) {
+                    df[i] = 30.0f * f[i] * f[i] * (f[i] * (f[i] - 2.0f) + 1.0f);
+                    f[i] = ei::smootherstep(f[i]);
+                }
+            break;
+        case cn::Interpolation::COSINE:
+            for(int i = 0; i < N; ++i) {
+                df[i] = 0.5f * sin(f[i]);
+                f[i] = 0.5f - 0.5f * cos(f[i]);
+            }
+            break;
+    }
+    if(_interp == cn::Interpolation::POINT) {
+        return cndetails::perlinNoiseRec<RndGen, 0, N>(_generator, _x, ix, _seed);
+    } else {
+        return cndetails::perlinNoiseRecG<RndGen, 0, N>(_generator, _x, ix, _frequency, f, df, _seed, _gradient, 1.0f) * 0.5f + 0.5f;
+    }
 }
 
 
