@@ -57,9 +57,10 @@ void test_fields()
         //image[x + y*512] = stdTurbulence(hasher, perlinNoise<WangHash,2>, ei::Vec2(x / 512.0f, y / 512.0f), ei::IVec2(4), Interpolation::SMOOTHERSTEP, 29368, 6);
         //image[x + y*512] = billowyTurbulence(hasher, perlinNoise<WangHash,2>, ei::Vec2(x / 512.0f, y / 512.0f), ei::IVec2(4), Interpolation::SMOOTHERSTEP, 29368, 6);
         //image[x + y*512] = ridgedTurbulence(hasher, perlinNoise<WangHash,2>, ei::Vec2(x / 512.0f, y / 512.0f), ei::IVec2(4), Interpolation::SMOOTHERSTEP, 29368, 6);
-        ei::Vec2 g;
-        float v = perlinNoiseG(hasher, ei::Vec2(x / 512.0f, y / 512.0f), ei::IVec2(9), Interpolation::SMOOTHERSTEP, 29368, g);
-        image[x + y*512] = v;
+        image[x + y*512] = swissTurbulence(hasher, perlinNoiseG<WangHash,2>, ei::Vec2(x / 512.0f, y / 512.0f), ei::IVec2(4), Interpolation::SMOOTHERSTEP, 29368, 6);
+        /*ei::Vec2 g;
+        float v = perlinNoiseG(hasher, ei::Vec2(x / 512.0f, y / 512.0f), ei::IVec2(4), Interpolation::SMOOTHERSTEP, 29368, g);
+        image[x + y*512] = g.x;*/
     }
     // "Shade the hills"
     std::vector<float> image2(512 * 512);
@@ -72,11 +73,11 @@ void test_fields()
                          + (image[x + y*512] - image[((x+8)&511) + y*512]) * 0.0625f
                          + (image[x + y*512] - image[((x+13)&511) + y*512]) * 0.03125f;
         image2[x + y*512] = (0.5f + pseudoGrad * 10.0f) * image[x + y*512] * 2.0f;
-        //image2[x + y*512] = image[((x+511)&511) + y*512] - image[(x+1)&511 + y*512];
-        image2[x + y*512] = perlinNoise(hasher, ei::Vec2(x / 512.0f - 1e-5f, y / 512.0f), ei::IVec2(9), Interpolation::SMOOTHERSTEP, 29368) - perlinNoise(hasher, ei::Vec2(x / 512.0f + 1e-5f, y / 512.0f), ei::IVec2(9), Interpolation::SMOOTHERSTEP, 29368);
+        //image2[x + y*512] = perlinNoise(hasher, ei::Vec2(x / 512.0f - 1e-5f, y / 512.0f), ei::IVec2(9), Interpolation::SMOOTHERSTEP, 29368) - perlinNoise(hasher, ei::Vec2(x / 512.0f + 1e-5f, y / 512.0f), ei::IVec2(9), Interpolation::SMOOTHERSTEP, 29368);
     }
-    //writePFM("stdTurbulence4_perlin.pfm", 512, image2.data());
-    //writePFM("billowyTurbulence4_perlin.pfm", 512, image2.data());
-    //writePFM("ridgedTurbulence4_perlin.pfm", 512, image2.data());
-    writePFM("gradientTestA.pfm", 512, image2.data());
+    //writePFM("stdTurbulence6_perlin.pfm", 512, image2.data());
+    //writePFM("billowyTurbulence6_perlin.pfm", 512, image2.data());
+    //writePFM("ridgedTurbulence6_perlin.pfm", 512, image2.data());
+    writePFM("swissTurbulence6_perlin.pfm", 512, image2.data());
+    //writePFM("gradientTest.pfm", 512, image.data());
 }

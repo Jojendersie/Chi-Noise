@@ -60,6 +60,10 @@ namespace cn {
     float ridgedTurbulence(RndGen& _generator, GenFunc _field, ei::Vec<float,N> _x, const ei::Vec<int,N>& _frequency, Interpolation _interp, uint32 _seed,
         int _octaves, float _frequenceMultiplier = 1.92f, float _amplitudeMultiplier = 0.5f);
 
+    template<typename RndGen, int N, typename GenFunc>
+    float swissTurbulence(RndGen& _generator, GenFunc _field, ei::Vec<float,N> _x, const ei::Vec<int,N>& _frequency, Interpolation _interp, uint32 _seed,
+        int _octaves, float _frequenceMultiplier = 1.92f, float _amplitudeMultiplier = 0.5f, float _warp = 0.1f);
+
 
     // include template implementation
 #   include "details/fieldnoise.inl"

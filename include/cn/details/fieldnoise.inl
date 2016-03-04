@@ -160,31 +160,34 @@ namespace cndetails {
     }
 
 
-    // _wa: product off all interpolation weights
+    // _wa: product off all interpolation weights except the current dimension
     // _f interpolation factors
     // _df: derivative of f
     template<typename RndGen, int N, int NMAX>
-    static inline typename std::enable_if<N==NMAX, float>::type perlinNoiseRecG(RndGen& _generator, ei::Vec<float,NMAX> _toGrid, ei::Vec<int,NMAX> _ix, const ei::Vec<int,NMAX>& _frequency, const ei::Vec<float,NMAX>& _f, const ei::Vec<float,NMAX>& _df, uint32 _seed, ei::Vec<float,NMAX>& _gradient, float _wa)
+    static inline typename std::enable_if<N==NMAX, float>::type perlinNoiseRecG(RndGen& _generator, ei::Vec<float,NMAX> _toGrid, ei::Vec<int,NMAX> _ix, const ei::Vec<int,NMAX>& _frequency, const ei::Vec<float,NMAX>& _f, const ei::Vec<float,NMAX>& _df, uint32 _seed, ei::Vec<float,NMAX>& _gradient, const ei::Vec<float,NMAX>& _wa)
     {
         ei::Vec<float,NMAX> g( grad(_generator(_seed), _toGrid) );
         float v = dot(_toGrid, g);
         for(int i = 0; i < N; ++i)
-            if(_toGrid[i] < 0.0f)
-                _gradient[i] -= (v * _df[i] + g[i] * (1.0f - _f[i])) * (_wa / (1.0f - _f[i]));
+            if(_toGrid[i] <= 0.0f)
+                _gradient[i] -= (v * _df[i] + g[i] * (1.0f - _f[i])) * _wa[i];
             else
-                _gradient[i] += (v * _df[i] - g[i] * _f[i]) * (_wa / _f[i]);
+                _gradient[i] += (v * _df[i] - g[i] * _f[i]) * _wa[i];
         return v;
     }
 
     template<typename RndGen, int N, int NMAX>
-    static inline typename std::enable_if<N<NMAX, float>::type perlinNoiseRecG(RndGen& _generator, ei::Vec<float,NMAX> _toGrid, ei::Vec<int,NMAX> _ix, const ei::Vec<int,NMAX>& _frequency, const ei::Vec<float,NMAX>& _f, const ei::Vec<float,NMAX>& _df, uint32 _seed, ei::Vec<float,NMAX>& _gradient, float _wa)
+    static inline typename std::enable_if<N<NMAX, float>::type perlinNoiseRecG(RndGen& _generator, ei::Vec<float,NMAX> _toGrid, ei::Vec<int,NMAX> _ix, const ei::Vec<int,NMAX>& _frequency, const ei::Vec<float,NMAX>& _f, const ei::Vec<float,NMAX>& _df, uint32 _seed, ei::Vec<float,NMAX>& _gradient, const ei::Vec<float,NMAX>& _wa)
     {
+        ei::Vec<float,NMAX> wa;
         float w0 = 1.0f - _f[N];
         float w1 = _f[N];
-        float s0 = perlinNoiseRecG<RndGen, N+1, NMAX>(_generator, _toGrid, _ix, _frequency, _f, _df, _generator(_seed ^ _ix[N]), _gradient, _wa * w0);
+        for(int i = 0; i < NMAX; ++i) wa[i] = i == N ? _wa[i] : _wa[i] * w0;
+        float s0 = perlinNoiseRecG<RndGen, N+1, NMAX>(_generator, _toGrid, _ix, _frequency, _f, _df, _generator(_seed ^ _ix[N]), _gradient, wa);
         _ix[N] = (_ix[N] + 1) % _frequency[N];
         _toGrid[N] += 1.0f;
-        float s1 = perlinNoiseRecG<RndGen, N+1, NMAX>(_generator, _toGrid, _ix, _frequency, _f, _df, _generator(_seed ^ _ix[N]), _gradient, _wa * w1);
+        for(int i = 0; i < NMAX; ++i) wa[i] = i == N ? _wa[i] : _wa[i] * w1;
+        float s1 = perlinNoiseRecG<RndGen, N+1, NMAX>(_generator, _toGrid, _ix, _frequency, _f, _df, _generator(_seed ^ _ix[N]), _gradient, wa);
         return w0 * s0 + w1 * s1;
     }
 }
@@ -251,7 +254,8 @@ float perlinNoiseG(RndGen& _generator, ei::Vec<float,N> _x, const ei::Vec<int,N>
     if(_interp == cn::Interpolation::POINT) {
         return cndetails::perlinNoiseRec<RndGen, 0, N>(_generator, _x, ix, _seed);
     } else {
-        return cndetails::perlinNoiseRecG<RndGen, 0, N>(_generator, _x, ix, _frequency, f, df, _seed, _gradient, 1.0f) * 0.5f + 0.5f;
+        ei::Vec<float, N> wa(1.0f);
+        return cndetails::perlinNoiseRecG<RndGen, 0, N>(_generator, _x, ix, _frequency, f, df, _seed, _gradient, wa) * 0.5f + 0.5f;
     }
 }
 
@@ -311,4 +315,29 @@ float ridgedTurbulence(RndGen& _generator, GenFunc _field, ei::Vec<float,N> _x, 
     }
     // Normalize sum to [0,1]
     return sum * (_amplitudeMultiplier - 1.0f) / (amplitude - 1.0f);
+}
+
+template<typename RndGen, int N, typename GenFunc>
+float swissTurbulence(RndGen& _generator, GenFunc _field, ei::Vec<float,N> _x, const ei::Vec<int,N>& _frequency, Interpolation _interp, uint32 _seed,
+                    int _octaves, float _frequenceMultiplier, float _amplitudeMultiplier, float _warp)
+{
+    float sum = 0.0f;
+    ei::Vec<float, N> freq( _frequency );
+    float amplitude = 1.0f;
+    float amplitudeSum = 0.0f;
+    ei::Vec<float, N> gsum( 0.0f );
+    for(int i = 0; i < _octaves; ++i)
+    {
+        ei::Vec<float, N> g;
+        float val = _field(_generator, _x + _warp * gsum, ei::Vec<int, N>(freq), _interp, _seed, g);
+        val = val * 2.0f - 1.0f;
+        sum += (1.0f - abs(val)) * amplitude;
+        gsum -= g * (val * amplitude);
+        freq *= _frequenceMultiplier;
+        amplitudeSum += amplitude;
+        amplitude *= _amplitudeMultiplier * ei::saturate(sum);
+        eiAssert(sum == sum, "Unexpected NaN value!");
+    }
+    // Normalize sum to [0,1]
+    return sum / amplitudeSum;
 }
