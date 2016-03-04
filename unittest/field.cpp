@@ -57,7 +57,8 @@ void test_fields()
         //image[x + y*512] = stdTurbulence(hasher, perlinNoise<WangHash,2>, ei::Vec2(x / 512.0f, y / 512.0f), ei::IVec2(4), Interpolation::SMOOTHERSTEP, 29368, 6);
         //image[x + y*512] = billowyTurbulence(hasher, perlinNoise<WangHash,2>, ei::Vec2(x / 512.0f, y / 512.0f), ei::IVec2(4), Interpolation::SMOOTHERSTEP, 29368, 6);
         //image[x + y*512] = ridgedTurbulence(hasher, perlinNoise<WangHash,2>, ei::Vec2(x / 512.0f, y / 512.0f), ei::IVec2(4), Interpolation::SMOOTHERSTEP, 29368, 6);
-        image[x + y*512] = swissTurbulence(hasher, perlinNoiseG<WangHash,2>, ei::Vec2(x / 512.0f, y / 512.0f), ei::IVec2(4), Interpolation::SMOOTHERSTEP, 29368, 6);
+        //image[x + y*512] = swissTurbulence(hasher, perlinNoiseG<WangHash,2>, ei::Vec2(x / 512.0f, y / 512.0f), ei::IVec2(4), Interpolation::SMOOTHERSTEP, 29368, 6);
+        image[x + y*512] = jordanTurbulence(hasher, perlinNoiseG<WangHash,2>, ei::Vec2(x / 512.0f, y / 512.0f), ei::IVec2(4), Interpolation::SMOOTHERSTEP, 29368, 6);
         /*ei::Vec2 g;
         float v = perlinNoiseG(hasher, ei::Vec2(x / 512.0f, y / 512.0f), ei::IVec2(4), Interpolation::SMOOTHERSTEP, 29368, g);
         image[x + y*512] = g.x;*/
@@ -78,6 +79,7 @@ void test_fields()
     //writePFM("stdTurbulence6_perlin.pfm", 512, image2.data());
     //writePFM("billowyTurbulence6_perlin.pfm", 512, image2.data());
     //writePFM("ridgedTurbulence6_perlin.pfm", 512, image2.data());
-    writePFM("swissTurbulence6_perlin.pfm", 512, image2.data());
+    //writePFM("swissTurbulence6_perlin.pfm", 512, image2.data());
+    writePFM("jordanTurbulence6_perlin.pfm", 512, image.data());
     //writePFM("gradientTest.pfm", 512, image.data());
 }

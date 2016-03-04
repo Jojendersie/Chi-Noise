@@ -52,17 +52,33 @@ namespace cn {
     float stdTurbulence(RndGen& _generator, GenFunc _field, ei::Vec<float,N> _x, const ei::Vec<int,N>& _frequency, Interpolation _interp, uint32 _seed,
                         int _octaves, float _frequenceMultiplier = 1.92f, float _amplitudeMultiplier = 0.5f);
 
+    // Similar to stdTurbulence, but sums abs(value). This produces a blobby terrain
+    // with sharp valleys.
     template<typename RndGen, int N, typename GenFunc>
     float billowyTurbulence(RndGen& _generator, GenFunc _field, ei::Vec<float,N> _x, const ei::Vec<int,N>& _frequency, Interpolation _interp, uint32 _seed,
         int _octaves, float _frequenceMultiplier = 1.92f, float _amplitudeMultiplier = 0.5f);
 
+    // Similar to stdTurbulence, but sums 1-abs(value). This produces a terrain
+    // with sharp ridges.
     template<typename RndGen, int N, typename GenFunc>
     float ridgedTurbulence(RndGen& _generator, GenFunc _field, ei::Vec<float,N> _x, const ei::Vec<int,N>& _frequency, Interpolation _interp, uint32 _seed,
         int _octaves, float _frequenceMultiplier = 1.92f, float _amplitudeMultiplier = 0.5f);
 
+    // A turbulence function with the appearance of the alps/the mountains in Swiss.
+    // Implementation after:
+    // http://www.decarpentier.nl/scape-procedural-extensions
+    // The field function must be one of the ____G functions which supply the gradient.
     template<typename RndGen, int N, typename GenFunc>
     float swissTurbulence(RndGen& _generator, GenFunc _field, ei::Vec<float,N> _x, const ei::Vec<int,N>& _frequency, Interpolation _interp, uint32 _seed,
         int _octaves, float _frequenceMultiplier = 1.92f, float _amplitudeMultiplier = 0.5f, float _warp = 0.1f);
+
+    // A turbulence function with the appearance of mountains in Jordan.
+    // Implementation after:
+    // http://www.decarpentier.nl/scape-procedural-extensions
+    // The field function must be one of the ____G functions which supply the gradient.
+    template<typename RndGen, int N, typename GenFunc>
+    float jordanTurbulence(RndGen& _generator, GenFunc _field, ei::Vec<float,N> _x, const ei::Vec<int,N>& _frequency, Interpolation _interp, uint32 _seed,
+        int _octaves, float _frequenceMultiplier = 1.92f, float _amplitudeMultiplier = 0.5f, float _warp = 0.15f, float _damp = 0.6f);
 
 
     // include template implementation

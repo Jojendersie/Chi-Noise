@@ -341,3 +341,31 @@ float swissTurbulence(RndGen& _generator, GenFunc _field, ei::Vec<float,N> _x, c
     // Normalize sum to [0,1]
     return sum / amplitudeSum;
 }
+
+template<typename RndGen, int N, typename GenFunc>
+float jordanTurbulence(RndGen& _generator, GenFunc _field, ei::Vec<float,N> _x, const ei::Vec<int,N>& _frequency, Interpolation _interp, uint32 _seed,
+                    int _octaves, float _frequenceMultiplier, float _amplitudeMultiplier, float _warp, float _damp)
+{
+    float sum = 0.0f;
+    ei::Vec<float, N> freq( _frequency );
+    float amplitude = 1.0f;
+    float dampAmp = _amplitudeMultiplier;
+    float amplitudeSum = 0.0f;
+    ei::Vec<float, N> gsum( 0.0f );
+    for(int i = 0; i < _octaves; ++i)
+    {
+        ei::Vec<float, N> g;
+        float val = _field(_generator, _x + gsum * _warp / freq, ei::Vec<int, N>(freq), _interp, _seed, g);
+        val = val * 2.0f - 1.0f;    // [0,1] -> [-1,1]
+        sum += val * val * dampAmp; // add squared noise damped by the amplitude
+        amplitudeSum += dampAmp;
+        gsum += g * val;            // sum up gradients (no amplitude!)
+        // Prepare next iteration frequency and amplitude
+        freq *= _frequenceMultiplier;
+        amplitude *= _amplitudeMultiplier;
+        dampAmp = amplitude * (1.0f - _damp / (1.0f + dot(gsum, gsum)));
+        eiAssert(sum == sum, "Unexpected NaN value!");
+    }
+    // Normalize sum to [0,1]
+    return sum / amplitudeSum;
+}
