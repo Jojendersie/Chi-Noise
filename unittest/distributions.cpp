@@ -37,8 +37,33 @@ void test_distributions()
     }
     var /= 999999;
     // Unfortunately the samples do not have a high quality
-    if(!approx(mean, 0.0f, 1e-3f))     std::cerr << "FAILED: gaussian() samples have a wrong mean.";
-    if(!approx(var, 1.0f, 1e-2f))     std::cerr << "FAILED: gaussian() samples have a wrong variance.";
+    if(!approx(mean, 0.0f, 1e-3f))     std::cerr << "FAILED: gaussian() samples have a wrong mean.\n";
+    if(!approx(var, 1.0f, 1e-2f))     std::cerr << "FAILED: gaussian() samples have a wrong variance.\n";
+
+    // Multivariate Gaussian
+    Mat2x2 covar(8.0f, 2.0f, 2.0f, 1.0f);
+    Vec2 mu(-1.0f, 2.0f);
+    Mat2x2 covarL;
+    decomposeCholesky(covar, covarL);
+    Vec2 mean2 = gaussian(xorshiftRng, covarL, mu);
+    Mat2x2 covar2(0.0f);
+    for(int i = 0; i < 999999; ++i)
+    {
+        Vec2 sampleDir = gaussian(xorshiftRng, covarL, mu);
+        // Update expectation values
+        mean2 = mean2 + (sampleDir - mean2) / (i + 2);
+        covar2.m00 += sampleDir.x * sampleDir.x;
+        covar2.m01 += sampleDir.x * sampleDir.y;
+        covar2.m11 += sampleDir.y * sampleDir.y;
+    }
+    // Compute variances / covariances from expectation values.
+    covar2.m00 = covar2.m00 / 999999 - mean2.x * mean2.x;
+    covar2.m01 = covar2.m01 / 999999 - mean2.x * mean2.y;
+    covar2.m11 = covar2.m11 / 999999 - mean2.y * mean2.y;
+    // Copy symmetric part of the matrix
+    covar2.m10 = covar2.m01;
+    if(!approx(mean2, mu, 1e-3f))     std::cerr << "FAILED: gaussian() 2D samples have a wrong mean.\n";
+    if(!approx(covar2, covar, 1e-2f))     std::cerr << "FAILED: gaussian() 2D samples have a wrong covariance matrix.\n";
 
     // Test exponential distribution
     mean = exponential(xorshiftRng, 5.0f);
@@ -50,6 +75,6 @@ void test_distributions()
         var = var + (x - oldM) * (x - mean);
     }
     var /= 999999;
-    if(!approx(mean, 0.2f))     std::cerr << "FAILED: exponential() samples have a wrong mean.";
-    if(!approx(var, 0.04f))     std::cerr << "FAILED: exponential() samples have a wrong variance.";
+    if(!approx(mean, 0.2f, 1e-3f))     std::cerr << "FAILED: exponential() samples have a wrong mean.\n";
+    if(!approx(var, 0.04f, 1e-3f))     std::cerr << "FAILED: exponential() samples have a wrong variance.\n";
 }

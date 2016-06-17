@@ -26,6 +26,17 @@ namespace cn {
     template<typename RndGen>
     float gaussian(RndGen& _generator, float _sigma, float _mu);
 
+    // Get a multivariate Gaussian sample x with a distribution of
+    // exp((x - mu)' S^-1 (x - mu)) where mu is the center and S the
+    // covariance matrix.
+    // This generator consumes 2 * ceil(N/2) samples. I.e. N samples if N is even.
+    // _sigmaSqrt: A lower triangular matrix L such that S = L * L'. You can
+    //      compute L using ei::decomposeCholesky on the covariance matrix.
+    //
+    //      The pre-factorization allows a faster generation of multiple samples.
+    template<typename RndGen, uint N>
+    ei::Vec<float, N> gaussian(RndGen& _generator, const ei::Matrix<float, N, N>& _sigmaSqrt, const ei::Vec<float, N>& _mu);
+
     // Get an exponential distributed sample in [0, oo].
     template<typename RndGen>
     float exponential(RndGen& _generator, float _lambda);
