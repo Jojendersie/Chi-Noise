@@ -13,6 +13,23 @@ namespace cn {
     template<typename RndGen>
     float uniformEx(RndGen& _generator);
 
+    // Get a Gaussian (normal distributed) sample in [-oo,oo] with standard
+    // deviation 1 and mean 0.
+    // This generator consumes two samples.
+    template<typename RndGen>
+    float gaussian(RndGen& _generator);
+
+    // Get a Gaussian (normal distributed) sample in [-oo,oo].
+    // This generator consumes two samples.
+    // _sigma: standard deviation
+    // _mu: mean
+    template<typename RndGen>
+    float gaussian(RndGen& _generator, float _sigma, float _mu);
+
+    // Get an exponential distributed sample in [0, oo].
+    template<typename RndGen>
+    float exponential(RndGen& _generator, float _lambda);
+
     // Get a uniform distributed normalized direction vector.
     // This generator consumes two samples.
     template<typename RndGen>

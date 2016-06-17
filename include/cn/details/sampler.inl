@@ -11,6 +11,32 @@ float uniformEx(RndGen& _generator)
 }
 
 template<typename RndGen>
+float gaussian(RndGen& _generator)
+{
+    // Box muller method.
+    double u0 = _generator() / 4294967295.0;
+    double u1 = _generator() / 4294967295.0;
+    double R = sqrt(max(0.0, -2.0*log(u0+1.0e-323)));
+    return float(R * cos(6.283185307179586476925286766559 * u1));
+}
+
+template<typename RndGen>
+float gaussian(RndGen& _generator, float _sigma, float _mu)
+{
+    double u0 = _generator() / 4294967295.0;
+    double u1 = _generator() / 4294967295.0;
+    double R = sqrt(max(0.0, -2.0*log(u0 + 1.0e-323)));
+    return float(_mu + _sigma * R * cos(6.283185307179586476925286766559 * u1));
+}
+
+template<typename RndGen>
+float exponential(RndGen& _generator, float _lambda)
+{
+    double u0 = _generator() / 4294967295.0;
+    return float(-log(u0 + 1.0e-323) / _lambda);
+}
+
+template<typename RndGen>
 ei::Vec3 direction(RndGen& _generator)
 {
     float cosTheta = uniform(_generator) * 2.0f - 1.0f;
