@@ -16,7 +16,12 @@ namespace cn {
     }
 
 
-    const int HaltonRng::BASES[8] = {2, 3, 5, 7, 11, 13, 17, 19};
+    static const int PRIMES[32] = {
+        2, 3, 5, 7, 11, 13, 17, 19,
+        23, 29, 31, 37, 41, 43, 47, 53,
+        59, 61, 67, 71, 73, 79, 83, 89,
+        97, 101, 103, 107, 109, 113, 127, 131
+    };
 
     HaltonRng::HaltonRng(uint32 _numBases) :
         numBases(_numBases),
@@ -26,13 +31,37 @@ namespace cn {
 
     uint32 HaltonRng::operator () ()
     {
-        uint32 base = BASES[counter % numBases];
+        uint32 base = PRIMES[counter % numBases];
         uint32 i = counter / numBases;
         uint32 result = 0;
         uint32 f = uint32(0x100000000ull / base);
         while(i > 0)
         {
             result += f * (i % base);
+            i /= base;
+            f /= base;
+        }
+        ++counter;
+        return result;
+    }
+
+
+    HaltonRevRng::HaltonRevRng(uint32 _numBases) :
+        numBases(_numBases),
+        counter(_numBases) // Skip all the 0 entries
+    {
+    }
+
+    static uint32 reversePermutation(uint32 i, uint32 b) { return i==0 ? 0 : b-i; }
+    uint32 HaltonRevRng::operator () ()
+    {
+        uint32 base = PRIMES[counter % numBases];
+        uint32 i = counter / numBases;
+        uint32 result = 0;
+        uint32 f = uint32(0x100000000ull / base);
+        while(i > 0)
+        {
+            result += f * reversePermutation(i % base, base);
             i /= base;
             f /= base;
         }
