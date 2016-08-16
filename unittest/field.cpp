@@ -1,30 +1,11 @@
 #include "cn/fieldnoise.hpp"
 #include <iostream>
 #include <vector>
-#include <fstream>
+
+bool writePFM(const char* _name, int _size, const float* _data);
+
 
 using namespace cn;
-
-static bool writePFM(const char* _name, int _size, const float* _data)
-{
-    std::ofstream file(_name, std::ios::binary);
-    if(!file.bad() && !file.fail())
-    {
-        file.write("Pf\n", sizeof(char) * 3);
-        file << _size << " " << _size << "\n";
-
-        file.write("-1.000000\n", sizeof(char) * 10);
-
-        file.write(reinterpret_cast<const char*>(_data), sizeof(float) * _size * _size);
-
-        return true;
-    }
-    else
-    {
-        std::cerr << "Error writing hdr image to " << _name;
-        return false;
-    }
-}
 
 void test_fields()
 {
