@@ -16,6 +16,31 @@ namespace cn {
     }
 
 
+
+    Rule30CARng::Rule30CARng(uint32 _seed)
+    {
+        state[0] = _seed * 0x9320DFF68710C996;
+        state[1] = _seed * 0x120287B46240898C;
+    }
+
+    uint32 Rule30CARng::operator () ()
+    {
+        // Each state variable is handled as 61 bit shift register.
+        uint64 ap = (state[0] << 1) | ((state[0] >> 60) & 1);
+        uint64 an = ((state[0] >> 1) & 0x1fffffffffffffff) | (state[0] << 60);
+        state[0] = ap ^ (state[0] | an);
+        ap = (state[1] << 1) | ((state[1] >> 60) & 1);
+        an = ((state[1] >> 1) & 0x1fffffffffffffff) | (state[1] << 60);
+        state[1] = ap ^ (state[1] | an);
+
+        // Extract 32 bits from the 122 possible bits.
+        uint64 x = state[0] & 0x2111211112122112 | state[1] & 0x1222122221211221;
+        // Now the pattern of x is 00xx 00xx. Pack that together...
+        return uint32(x | (x >> 30));
+    }
+
+
+
     static const int PRIMES[32] = {
         2, 3, 5, 7, 11, 13, 17, 19,
         23, 29, 31, 37, 41, 43, 47, 53,

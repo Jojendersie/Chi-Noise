@@ -50,7 +50,8 @@ namespace cn {
     //      length -> 0 discrepancy for infinite samples = uniform.
     //      This measure depends on the number of samples, as it should go to 0
     //      for infinitely many. Important is that it goes down faster. For that
-    //      reason numbers are provided for N=10/100/1000/10000 samples.
+    //      reason numbers are provided for N=10/100/1000/10000 samples per
+    //      dimension.
     //      Lower is better.
     //
     // Avalanche: A test for the distribution of hash codes. Full avalanche
@@ -74,6 +75,25 @@ namespace cn {
         uint32 state;
     public:
         Xorshift32Rng(uint32 _seed);
+
+        uint32 operator () ();
+    };
+
+    // Cellular automaton RNG after Wolfram's Rule 30.
+    // http://www.stephenwolfram.com/publications/academic/random-sequence-generation-cellular-automata.pdf
+    // The rule 30 is a cellular automaton rule using the two adjacent and the current
+    // bit to determine the next one.
+    // The specific rule is: a(i) = a(i-1) ^ (a(i) | a(i+1))
+    // State-Size: 16 Byte
+    // L2-Discrepancy 1D: 1.12e-2 / 9.42e-3 / 2.92e-5 / 3.47e-6
+    //                2D: 2.33e-3 / 1.29e-4 / 1.54e-5 / 1.52e-6
+    //                3D: 3.45e-4 / 3.71e-5 / 3.60e-6 / 3.17e-7
+    //                8D: 9.63e-8 / 5.98e-9 / 5.66e-10 / 6.05e-11
+    class Rule30CARng
+    {
+        uint64 state[2];
+    public:
+        Rule30CARng(uint32 _seed);
 
         uint32 operator () ();
     };
@@ -139,9 +159,9 @@ namespace cn {
     // sequence. Only the first dimension differs as it is n/N. Thus, the number
     // of samples must be known in advance.
     // L2-Discrepancy 1D: 8.33e-4 / 8.33e-6 / 8.33e-8 / 8.33e-10
-    //                2D: 2.02e-3 / 1.73e-3 / 1.74e-3 / 1.74e-3  (? visually still really good)
-    //                3D: 2.85e-4 / 2.68e-4 / 2.58e-4 / 2.57e-4
-    //                8D: 2.33e-9 / 2.57e-9 / 1.84e-9 / 1.78e-9
+    //                2D: 6.46e-4 / 1.61e-5 / 1.70e-7 / 2.19e-9
+    //                3D: 2.30e-4 / 7.91e-6 / 1.99e-7 / 3.82e-9
+    //                8D: 8.90e-8 / 5.73e-9 / 4.62e-10 / 3.67e-11
     class HammersleyRng
     {
         uint32 numBases;
@@ -149,6 +169,8 @@ namespace cn {
         uint32 counter;
         static const int BASES[8];
     public:
+        // _numBases: number of independent dimensions
+        // _numSamples: number of samples per dimension
         HammersleyRng(uint32 _numBases, uint32 _numSamples);
 
         uint32 operator () ();

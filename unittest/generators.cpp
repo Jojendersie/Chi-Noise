@@ -14,16 +14,16 @@ template<typename RndGen>
 float l2discrepancy(RndGen _generator, int N, int D)
 {
     std::vector<float> samples(N*D);
-    for(int i = 0; i < N; ++i)
+    for(int i = 0; i < N*D; ++i)
         samples[i] = uniform(_generator);
     double a = 0.0, b = 0.0, prod;
-    for(int i = 0; i < N/D; ++i)
+    for(int i = 0; i < N; ++i)
     {
         prod = (1.0 - samples[i*D]) * samples[i*D];
         for(int d = 1; d < D; ++d)
             prod *= (1.0 - samples[i*D+d]) * samples[i*D+d];
         a += prod;
-        for(int j = 0; j < N/D; ++j)
+        for(int j = 0; j < N; ++j)
         {
             prod = (1.0 - max(samples[i*D], samples[j*D])) * min(samples[i*D], samples[j*D]);
             for(int d = 1; d < D; ++d)
@@ -92,6 +92,9 @@ void test_generators()
     // Xorshift
     Xorshift32Rng xorshift32(WangHash()(83642));
 
+    // Rule30CA
+    Rule30CARng rule30(WangHash()(83642));
+
     // Halton sequences
     HaltonRng halton;
     if(uniformEx(halton) != 0.5f)    std::cerr << "FAILED: 1. number of Halton sequence wrong.\n";
@@ -118,13 +121,15 @@ void test_generators()
     for(int i=10; i<=10000; i*=10)
         std::cout << "L2-discrepancy of the Xorshift32 generator is: " << l2discrepancy(xorshift32, i, D) << '\n';
     for(int i=10; i<=10000; i*=10)
+        std::cout << "L2-discrepancy of the Rule30 generator is: " << l2discrepancy(rule30, i, D) << '\n';
+    for(int i=10; i<=10000; i*=10)
         std::cout << "L2-discrepancy of the Halton generator is: " << l2discrepancy(haltonStat, i, D) << '\n';
     for(int i=10; i<=10000; i*=10)
         std::cout << "L2-discrepancy of the Additive Recurrence generator is: " << l2discrepancy(additiveStat, i, D) << '\n';
-    const HammersleyRng hammersley10(D,10/D);
-    const HammersleyRng hammersley100(D,100/D);
-    const HammersleyRng hammersley1000(D,1000/D);
-    const HammersleyRng hammersley10000(D,10000/D);
+    const HammersleyRng hammersley10(D,10);
+    const HammersleyRng hammersley100(D,100);
+    const HammersleyRng hammersley1000(D,1000);
+    const HammersleyRng hammersley10000(D,10000);
     std::cout << "L2-discrepancy of the Hammersley generator is: " << l2discrepancy(hammersley10, 10, D) << " / "
         << l2discrepancy(hammersley100, 100, D) << " / "
         << l2discrepancy(hammersley1000, 1000, D) << " / "
