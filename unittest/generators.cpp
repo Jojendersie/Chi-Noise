@@ -87,13 +87,26 @@ float avalanche(Hasher _hash, uint32 N)
     return avalanche / 1024.0f;
 }
 
+static bool is_prime(uint64 p)
+{
+    uint64 n = uint64(sqrt(p));
+    for(uint64 i = 3; i < n; i+=2)
+        if(p%i == 0) return false;
+    return true;
+}
+
 void test_generators()
 {
-    // Xorshift
-    Xorshift32Rng xorshift32(WangHash()(83642));
+    /*uint64 a = (1ull << 62) + 1;
+    while(!is_prime(a * 0x100000000 + 1))
+        a += 2;
+    std::cout << a << '\n';*/
 
-    // Rule30CA
-    Rule30CARng rule30(WangHash()(83642));
+    // Standard RNGs
+    uint32 stdSeed = WangHash()(83642);
+    Xorshift32Rng xorshift32(stdSeed);
+    Rule30CARng rule30(stdSeed);
+    CmwcRng cmcw(stdSeed);
 
     // Halton sequences
     HaltonRng halton;
@@ -122,6 +135,10 @@ void test_generators()
         std::cout << "L2-discrepancy of the Xorshift32 generator is: " << l2discrepancy(xorshift32, i, D) << '\n';
     for(int i=10; i<=10000; i*=10)
         std::cout << "L2-discrepancy of the Rule30 generator is: " << l2discrepancy(rule30, i, D) << '\n';
+    std::cout << "L2-discrepancy of the Cmcw generator is: " << l2discrepancy(cmcw, 10, D) << " / "
+        << l2discrepancy(cmcw, 100, D) << " / "
+        << l2discrepancy(cmcw, 1000, D) << " / "
+        << l2discrepancy(cmcw, 10000, D) << '\n';
     for(int i=10; i<=10000; i*=10)
         std::cout << "L2-discrepancy of the Halton generator is: " << l2discrepancy(haltonStat, i, D) << '\n';
     for(int i=10; i<=10000; i*=10)

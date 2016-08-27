@@ -45,6 +45,37 @@ namespace cn {
 
 
 
+    CmwcRng::CmwcRng(uint32 _seed) :
+        counter(0),
+        carry(WangHash()(_seed + 12497) % 809430660)
+    {
+        for(int i = 0; i < 4; ++i)
+            state[i] = WangHash()(_seed + i);
+    }
+
+    uint32 CmwcRng::operator () ()
+    {
+        uint64 t = 0;
+        //const uint64 a = 18782;       // as Marsaglia recommends
+        const uint64 a = 41305945;       // deterimend from the rule a*b^lag + 1 = prime with b^lag = 2^(32*4)
+        uint32 x = 0;
+
+        counter = (counter + 1) & (LAG - 1);
+        t = a * state[counter] + carry;
+        carry = t >> 32;
+        /*x = t + carry;
+        if (x < carry)
+        {
+            x++;
+            carry++;
+        }*/
+        x = (uint32)t;
+
+        return state[counter] = 0xfffffffe - x;
+    }
+
+
+
     static const int PRIMES[32] = {
         2, 3, 5, 7, 11, 13, 17, 19,
         23, 29, 31, 37, 41, 43, 47, 53,

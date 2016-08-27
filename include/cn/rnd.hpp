@@ -98,6 +98,24 @@ namespace cn {
         uint32 operator () ();
     };
 
+    // Complementary-multiply-with-carry RNG after Marsaglia.
+    // https://en.wikipedia.org/wiki/Multiply-with-carry
+    // This implementation uses a much smaller state size, as even lag-1 generators are
+    // already well.
+    // State-Size: 24
+    // Period: 2^153 ^= 10^46    (if I am not wrong in determining it)
+    class CmwcRng
+    {
+        enum { LAG = 4 };
+        uint32 state[LAG];
+        uint32 counter;
+        uint32 carry;
+    public:
+        CmwcRng(uint32 _seed);
+
+        uint32 operator () ();
+    };
+
     // Medium speed Quasi-RNG.
     // State-Size: 4 Byte
     // L2-Discrepancy 1D: 2.59e-3 / 2.72e-5 / 2.79e-7 / 3.06e-9
