@@ -114,7 +114,7 @@ void test_generators()
     std::cout << "Avalanche for JenkinsHash is: " << avalanche(JenkinsHash(), 128) << ", " << avalanche(JenkinsHash(), 1024) << ", " << avalanche(JenkinsHash(), 16384) << '\n';
 
     // *** L2 Discrepancy Test ***
-    const int D = 8;
+    const int D = 2;
     const Xorshift32Rng xorshift32Stat(WangHash()(83642));
     const HaltonRng haltonStat(D);
     const AdditiveRecurrenceRng additiveStat(D);

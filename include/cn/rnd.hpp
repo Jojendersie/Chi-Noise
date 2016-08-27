@@ -102,8 +102,8 @@ namespace cn {
     // State-Size: 4 Byte
     // L2-Discrepancy 1D: 2.59e-3 / 2.72e-5 / 2.79e-7 / 3.06e-9
     //                2D: 1.27e-3 / 2.46e-5 / 5.21e-7 / 9.82-9
-    //                3D: 3.43e-4 / 1.20e-5 / 3.80e-7 / 9.59e-9
-    //                8D: 8.36e-8 / 4.89e-9 / 4.96e-10 / 3.88e-11
+    //                3D: 3.45e-4 / 1.20e-5 / 3.80e-7 / 9.59e-9
+    //                8D: 9.63e-8 / 5.98e-9 / 5.66e-10 / 6.05e-11
     // The Halton generator uses radical inverse functions with different
     // prime bases.
     class HaltonRng

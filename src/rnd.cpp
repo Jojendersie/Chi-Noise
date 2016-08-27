@@ -25,6 +25,10 @@ namespace cn {
 
     uint32 Rule30CARng::operator () ()
     {
+        // Somehow recover from full zero-state
+        if(state[0] == 0) state[0] = 0x00100000000010000 ^ state[1];
+        if(state[1] == 0) state[1] = 0x00000100000000100 ^ state[0];
+
         // Each state variable is handled as 61 bit shift register.
         uint64 ap = (state[0] << 1) | ((state[0] >> 60) & 1);
         uint64 an = ((state[0] >> 1) & 0x1fffffffffffffff) | (state[0] << 60);
