@@ -2,50 +2,67 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
+#include <algorithm>
 
 using namespace cn;
 using namespace ei;
 
 // Number of dimensions for discrepancy tests
-const int D = 2;
+const int D = 8;
 
 
 // http://people.mpi-inf.mpg.de/~winzen/Doerr.Gnewuch.Wahlstroem_CalculatingDiscrepancies.pdf
 // http://www.ams.org/journals/mcom/1996-65-216/S0025-5718-96-00756-9/S0025-5718-96-00756-9.pdf
 // http://users.minet.uni-jena.de/~novak/NW.pdf
 // http://epubs.siam.org/doi/pdf/10.1137/0915077
-const double MAX_UI32 = 0xffffffffull;
-static float l2discrepancy(const uint32* _samples, int N, int D)
+static float l2discrepancy(const double* _samples, int N, int D)
 {
     double a = 0.0, b = 0.0, prod;
     for(int i = 0; i < N; ++i)
     {
         prod = 1.0;
         for(int d = 0; d < D; ++d)
-            prod *= (1.0 - _samples[i*D+d] / MAX_UI32) * _samples[i*D+d] / MAX_UI32;
+            prod *= (1.0 - _samples[i*D+d]) * _samples[i*D+d];
         a += prod;
         for(int j = 0; j < N; ++j)
         {
             prod = 1.0;
             for(int d = 0; d < D; ++d)
-                prod *= (1.0 - max(_samples[i*D+d], _samples[j*D+d]) / MAX_UI32) * min(_samples[i*D+d], _samples[j*D+d]) / MAX_UI32;
+                prod *= (1.0 - max(_samples[i*D+d], _samples[j*D+d])) * min(_samples[i*D+d], _samples[j*D+d]);
             b += prod;
         }
     }
     return float(pow(12.0,-D) - a * pow(2.0,1-D) / N + b / (N * N));
 }
 
+// Compute the variance of gaps between all samples in a sorted order.
+// The mean should be 1/N.
+// The first and the last sample are also tested (cyclic gap).
+static float gapVariance(const double* _samples, int N)
+{
+    double gap = 1.0 / N;
+    double var = ei::sq( (1.0 + _samples[0] - _samples[99999]) - gap );
+    for(int i = 0; i < 99999; ++i)
+        var += ei::sq( (_samples[i+1] - _samples[i]) - gap );
+    return float(var / (N-1));
+}
+
 template<typename RNG>
 static void testRNG(RNG _generator, const char* _name)
 {
-    std::vector<uint32> samples(100000);
+    std::cout << "Testing generator " << _name << ":\n";
+    std::vector<double> samples(100000);
     for(int i=0; i<=100000; i++)
-        samples[i] = _generator();
-    std::cout << "L2-discrepancy of the " << _name << " generator is: "
+        samples[i] = _generator() / double(0xffffffffull);
+    std::cout << "    L2-discrepancy: "
         << l2discrepancy(samples.data(), 10, D) << " / "
         << l2discrepancy(samples.data(), 100, D) << " / "
         << l2discrepancy(samples.data(), 1000, D) << " / "
         << l2discrepancy(samples.data(), 10000, D) << '\n';
+
+    // Sorting makes some test useless and others faster...
+    std::sort(samples.begin(), samples.end());
+    std::cout << "    Gap variance: " << gapVariance(samples.data(), 100000) << '\n';
 }
 
 // Test for hash functions, if a change in any input bit changes all output bits
@@ -151,16 +168,20 @@ void test_generators()
     testRNG(additiveStat, "Additive Recurrence");
 
     // Hammersley
-    std::vector<uint32> samples(11110*D);
-    HammersleyRng hammersley10(D,10);         for(int i=0; i<=10*D; i++) samples[i] = hammersley10();
-    HammersleyRng hammersley100(D,100);       for(int i=0; i<=100*D; i++) samples[i+10*D] = hammersley100();
-    HammersleyRng hammersley1000(D,1000);     for(int i=0; i<=1000*D; i++) samples[i+110*D] = hammersley1000();
-    HammersleyRng hammersley10000(D,10000);   for(int i=0; i<=10000*D; i++) samples[i+1110*D] = hammersley10000();
-    std::cout << "L2-discrepancy of the Hammersley generator is: "
+    std::vector<double> samples(100000);
+    HammersleyRng hammersley10(D,10);         for(int i=0; i<=10*D; i++) samples[i] = hammersley10() / double(0xffffffffull);;
+    HammersleyRng hammersley100(D,100);       for(int i=0; i<=100*D; i++) samples[i+10*D] = hammersley100() / double(0xffffffffull);;
+    HammersleyRng hammersley1000(D,1000);     for(int i=0; i<=1000*D; i++) samples[i+110*D] = hammersley1000() / double(0xffffffffull);;
+    HammersleyRng hammersley10000(D,10000);   for(int i=0; i<=10000*D; i++) samples[i+1110*D] = hammersley10000() / double(0xffffffffull);;
+    std::cout << "Testing generator Hammersley:\n";
+    std::cout << "    L2-discrepancy: "
         << l2discrepancy(samples.data(), 10, D) << " / "
         << l2discrepancy(samples.data()+10, 100, D) << " / "
         << l2discrepancy(samples.data()+110, 1000, D) << " / "
         << l2discrepancy(samples.data()+1110, 10000, D) << '\n';
+    HammersleyRng hammersley100000(D,100000);  for(int i=0; i<=100000; i++) samples[i] = hammersley100000() / double(0xffffffffull);;
+    std::sort(samples.begin(), samples.end());
+    std::cout << "    Gap variance: " << gapVariance(samples.data(), 100000) << '\n';
 
 
     // *** Avalanche Test ***

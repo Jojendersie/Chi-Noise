@@ -54,6 +54,12 @@ namespace cn {
     //      dimension.
     //      Lower is better.
     //
+    // Gap-Variance: In a sorted set the average distance between two samples
+    //      should be 1/N for a nice uniform distribution. The variance is
+    //      the deviation from that expected gap.
+    //      This test is performed for 100'000 samples.
+    //      Lower is better.
+    //
     // Avalanche: A test for the distribution of hash codes. Full avalanche
     //      is reached if a change of any bit in the input causes each bit in
     //      the output to be flipped with a probability of 0.5.
@@ -70,6 +76,7 @@ namespace cn {
     //                2D: 2.07e-3 / 1.25e-4 / 1.44e-5 / 1.51e-6
     //                3D: 3.13e-4 / 3.01e-5 / 3.84e-6 / 4.27e-7
     //                8D: 2.81e-8 / 5.39e-9 / 5.55e-10 / 5.83e-11
+    // Gap-Variance: 1.00e-10
     class Xorshift32Rng
     {
         uint32 state;
@@ -89,6 +96,7 @@ namespace cn {
     //                2D: 2.33e-3 / 1.29e-4 / 1.54e-5 / 1.52e-6
     //                3D: 3.45e-4 / 3.71e-5 / 3.60e-6 / 3.17e-7
     //                8D: 9.63e-8 / 5.98e-9 / 5.66e-10 / 6.05e-11
+    // Gap-Variance: 9.94e-9
     class Rule30CARng
     {
         uint64 state[2];
@@ -104,6 +112,11 @@ namespace cn {
     // already well.
     // State-Size: 24
     // Period: 2^153 ^= 10^46    (if I am not wrong in determining it)
+    // L2-Discrepancy 1D: 2.48e-3 / 1.91e-4 / 3.85e-5 / 6.36e-6
+    //                2D: 2.48e-3 / 1.13e-4 / 2.93e-5 / 1.57e-6
+    //                3D: 6.26e-4 / 3.35e-5 / 4.33e-6 / 3.07e-7
+    //                8D: 8.69e-8 / 5.44e-9 / 5.71e-10 / 5.59e-11
+    // Gap-Variance: 9.93e-9
     class CmwcRng
     {
         enum { LAG = 4 };
@@ -122,6 +135,7 @@ namespace cn {
     //                2D: 1.27e-3 / 2.46e-5 / 5.21e-7 / 9.82-9
     //                3D: 3.45e-4 / 1.20e-5 / 3.80e-7 / 9.59e-9
     //                8D: 9.63e-8 / 5.98e-9 / 5.66e-10 / 6.05e-11
+    // Gap-Variance: 1.25e-11
     // The Halton generator uses radical inverse functions with different
     // prime bases.
     class HaltonRng
@@ -141,6 +155,7 @@ namespace cn {
     //                2D: 
     //                3D: 
     //                8D: 
+    // Gap-Variance: 
     // This is a variant of the Halton generator which uses a reverse
     // permutation to increase independence of more bases.
     class HaltonRevRng
@@ -160,6 +175,7 @@ namespace cn {
     //                2D: 1.53e-3 / 3.29e-5 / 4.96e-7 / 3.30e-8
     //                3D: 3.19e-4 / 1.31e-5 / 2.50e-6 / 3.52e-8
     //                8D: 7.84e-8 / 5.30e-9 / 6.78e-10 / 1.67e-10
+    // Gap-Variance: 1.79e-11
     class AdditiveRecurrenceRng
     {
         uint32 numBases;
@@ -180,6 +196,7 @@ namespace cn {
     //                2D: 6.46e-4 / 1.61e-5 / 1.70e-7 / 2.19e-9
     //                3D: 2.30e-4 / 7.91e-6 / 1.99e-7 / 3.82e-9
     //                8D: 8.90e-8 / 5.73e-9 / 4.62e-10 / 3.67e-11
+    // Gap-Variance: 1.19e-20
     class HammersleyRng
     {
         uint32 numBases;

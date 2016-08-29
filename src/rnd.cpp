@@ -46,11 +46,13 @@ namespace cn {
 
 
     CmwcRng::CmwcRng(uint32 _seed) :
-        counter(0),
+        counter(LAG-1),
         carry(WangHash()(_seed + 12497) % 809430660)
     {
         for(int i = 0; i < 4; ++i)
             state[i] = WangHash()(_seed + i);
+        for(int i = 0; i < 5; ++i)
+            operator()();
     }
 
     uint32 CmwcRng::operator () ()
