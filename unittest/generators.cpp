@@ -6,32 +6,46 @@
 using namespace cn;
 using namespace ei;
 
+// Number of dimensions for discrepancy tests
+const int D = 2;
+
+
 // http://people.mpi-inf.mpg.de/~winzen/Doerr.Gnewuch.Wahlstroem_CalculatingDiscrepancies.pdf
 // http://www.ams.org/journals/mcom/1996-65-216/S0025-5718-96-00756-9/S0025-5718-96-00756-9.pdf
 // http://users.minet.uni-jena.de/~novak/NW.pdf
 // http://epubs.siam.org/doi/pdf/10.1137/0915077
-template<typename RndGen>
-float l2discrepancy(RndGen _generator, int N, int D)
+const double MAX_UI32 = 0xffffffffull;
+static float l2discrepancy(const uint32* _samples, int N, int D)
 {
-    std::vector<float> samples(N*D);
-    for(int i = 0; i < N*D; ++i)
-        samples[i] = uniform(_generator);
     double a = 0.0, b = 0.0, prod;
     for(int i = 0; i < N; ++i)
     {
-        prod = (1.0 - samples[i*D]) * samples[i*D];
-        for(int d = 1; d < D; ++d)
-            prod *= (1.0 - samples[i*D+d]) * samples[i*D+d];
+        prod = 1.0;
+        for(int d = 0; d < D; ++d)
+            prod *= (1.0 - _samples[i*D+d] / MAX_UI32) * _samples[i*D+d] / MAX_UI32;
         a += prod;
         for(int j = 0; j < N; ++j)
         {
-            prod = (1.0 - max(samples[i*D], samples[j*D])) * min(samples[i*D], samples[j*D]);
-            for(int d = 1; d < D; ++d)
-                prod *= (1.0 - max(samples[i*D+d], samples[j*D+d])) * min(samples[i*D+d], samples[j*D+d]);
+            prod = 1.0;
+            for(int d = 0; d < D; ++d)
+                prod *= (1.0 - max(_samples[i*D+d], _samples[j*D+d]) / MAX_UI32) * min(_samples[i*D+d], _samples[j*D+d]) / MAX_UI32;
             b += prod;
         }
     }
     return float(pow(12.0,-D) - a * pow(2.0,1-D) / N + b / (N * N));
+}
+
+template<typename RNG>
+static void testRNG(RNG _generator, const char* _name)
+{
+    std::vector<uint32> samples(100000);
+    for(int i=0; i<=100000; i++)
+        samples[i] = _generator();
+    std::cout << "L2-discrepancy of the " << _name << " generator is: "
+        << l2discrepancy(samples.data(), 10, D) << " / "
+        << l2discrepancy(samples.data(), 100, D) << " / "
+        << l2discrepancy(samples.data(), 1000, D) << " / "
+        << l2discrepancy(samples.data(), 10000, D) << '\n';
 }
 
 // Test for hash functions, if a change in any input bit changes all output bits
@@ -104,9 +118,18 @@ void test_generators()
 
     // Standard RNGs
     uint32 stdSeed = WangHash()(83642);
+
+    // Xorshift
     Xorshift32Rng xorshift32(stdSeed);
+    testRNG(xorshift32, "Xorshift32");
+
+    // Cellular automaton
     Rule30CARng rule30(stdSeed);
+    testRNG(rule30, "Rule30");
+
+    // Multiply with carry
     CmwcRng cmcw(stdSeed);
+    testRNG(cmcw, "Cmcw");
 
     // Halton sequences
     HaltonRng halton;
@@ -120,37 +143,31 @@ void test_generators()
     if(!approx(uniformEx(halton2), 2.0f/3.0f))    std::cerr << "FAILED: 4. number of Halton-2 sequence wrong.\n";
     if(uniformEx(halton2) != 0.75f)    std::cerr << "FAILED: 5. number of Halton-2 sequence wrong.\n";
     if(!approx(uniformEx(halton2), 1.0f/9.0f))    std::cerr << "FAILED: 6. number of Halton-2 sequence wrong.\n";
+    const HaltonRng haltonStat(D);
+    testRNG(haltonStat, "Halton");
+
+    // Additive recurrence
+    const AdditiveRecurrenceRng additiveStat(D);
+    testRNG(additiveStat, "Additive Recurrence");
+
+    // Hammersley
+    std::vector<uint32> samples(11110*D);
+    HammersleyRng hammersley10(D,10);         for(int i=0; i<=10*D; i++) samples[i] = hammersley10();
+    HammersleyRng hammersley100(D,100);       for(int i=0; i<=100*D; i++) samples[i+10*D] = hammersley100();
+    HammersleyRng hammersley1000(D,1000);     for(int i=0; i<=1000*D; i++) samples[i+110*D] = hammersley1000();
+    HammersleyRng hammersley10000(D,10000);   for(int i=0; i<=10000*D; i++) samples[i+1110*D] = hammersley10000();
+    std::cout << "L2-discrepancy of the Hammersley generator is: "
+        << l2discrepancy(samples.data(), 10, D) << " / "
+        << l2discrepancy(samples.data()+10, 100, D) << " / "
+        << l2discrepancy(samples.data()+110, 1000, D) << " / "
+        << l2discrepancy(samples.data()+1110, 10000, D) << '\n';
+
 
     // *** Avalanche Test ***
     std::cout << "Avalanche for KnuthHash is: " << avalanche(KnuthHash(), 128) << ", " << avalanche(KnuthHash(), 1024) << ", " << avalanche(KnuthHash(), 16384) << '\n';
     std::cout << "Avalanche for WangHash is: " << avalanche(WangHash(), 128) << ", " << avalanche(WangHash(), 1024) << ", " << avalanche(WangHash(), 16384) << '\n';
     std::cout << "Avalanche for JenkinsHash is: " << avalanche(JenkinsHash(), 128) << ", " << avalanche(JenkinsHash(), 1024) << ", " << avalanche(JenkinsHash(), 16384) << '\n';
 
-    // *** L2 Discrepancy Test ***
-    const int D = 2;
-    const Xorshift32Rng xorshift32Stat(WangHash()(83642));
-    const HaltonRng haltonStat(D);
-    const AdditiveRecurrenceRng additiveStat(D);
-    for(int i=10; i<=10000; i*=10)
-        std::cout << "L2-discrepancy of the Xorshift32 generator is: " << l2discrepancy(xorshift32, i, D) << '\n';
-    for(int i=10; i<=10000; i*=10)
-        std::cout << "L2-discrepancy of the Rule30 generator is: " << l2discrepancy(rule30, i, D) << '\n';
-    std::cout << "L2-discrepancy of the Cmcw generator is: " << l2discrepancy(cmcw, 10, D) << " / "
-        << l2discrepancy(cmcw, 100, D) << " / "
-        << l2discrepancy(cmcw, 1000, D) << " / "
-        << l2discrepancy(cmcw, 10000, D) << '\n';
-    for(int i=10; i<=10000; i*=10)
-        std::cout << "L2-discrepancy of the Halton generator is: " << l2discrepancy(haltonStat, i, D) << '\n';
-    for(int i=10; i<=10000; i*=10)
-        std::cout << "L2-discrepancy of the Additive Recurrence generator is: " << l2discrepancy(additiveStat, i, D) << '\n';
-    const HammersleyRng hammersley10(D,10);
-    const HammersleyRng hammersley100(D,100);
-    const HammersleyRng hammersley1000(D,1000);
-    const HammersleyRng hammersley10000(D,10000);
-    std::cout << "L2-discrepancy of the Hammersley generator is: " << l2discrepancy(hammersley10, 10, D) << " / "
-        << l2discrepancy(hammersley100, 100, D) << " / "
-        << l2discrepancy(hammersley1000, 1000, D) << " / "
-        << l2discrepancy(hammersley10000, 10000, D) << '\n';
     /*std::ofstream file;
     file.open("test.csv");
     for(int i = 0; i < 1000; ++i)
