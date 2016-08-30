@@ -152,6 +152,10 @@ void test_generators()
     Lfsr113Rng lfsr113(stdSeed);
     testRNG(lfsr113, "Lfsr113");
 
+    // WELL
+    Well512Rng well512(stdSeed);
+    testRNG(well512, "Well512");
+
     // Halton sequences
     HaltonRng halton;
     if(uniformEx(halton) != 0.5f)    std::cerr << "FAILED: 1. number of Halton sequence wrong.\n";

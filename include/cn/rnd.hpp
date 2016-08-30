@@ -110,7 +110,7 @@ namespace cn {
     // https://en.wikipedia.org/wiki/Multiply-with-carry
     // This implementation uses a much smaller state size, as even lag-1 generators are
     // already well.
-    // State-Size: 24
+    // State-Size: 24 Byte
     // Period: 2^153 ^= 10^46    (if I am not wrong in determining it)
     // L2-Discrepancy 1D: 2.48e-3 / 1.91e-4 / 3.85e-5 / 6.36e-6
     //                2D: 2.48e-3 / 1.13e-4 / 2.93e-5 / 1.57e-6
@@ -131,7 +131,7 @@ namespace cn {
 
     // Linear Feedback Shift Register RNG from L'Ecuyer 1999:
     // "Tables of Maximally-Equidistributed Combined LFSR Generators".
-    // State-Size: 16
+    // State-Size: 16 Byte
     // Period: 2^113 ^= 10^34
     // L2-Discrepancy 1D: 1.13e-2 / 4.72e-4 / 9.79e-5 / 1.37e-5
     //                2D: 1.82e-3 / 1.34e-4 / 2.46e-5 / 1.81e-6
@@ -143,6 +143,27 @@ namespace cn {
         uint32 state[4];
     public:
         Lfsr113Rng(uint32 _seed);
+
+        uint32 operator () ();
+    };
+
+    // WELL = Well Equidistributed Long-period Linear from Panneton,
+    // Matsumoto and L'Ecuyer 2006:
+    // "Improved Long-Period Generators Based on Linear Recurrences Modulo 2".
+    // Implementation from Chris Lomont "Random Number Generation".
+    // State-Size: 68 Byte
+    // Period: 2^512 ^= 10^154
+    // L2-Discrepancy 1D: 3.52e-2 / 8.11e-4 / 4.60e-5 / 1.17e-5
+    //                2D: 2.48e-3 / 1.37e-4 / 1.08e-5 / 1.93e-6
+    //                3D: 2.79e-4 / 3.64e-5 / 4.00e-6 / 3.23e-7
+    //                8D: 3.41e-8 / 6.72e-9 / 6.56e-10 / 5.73e-11
+    // Gap-Variance: 1.01e-10
+    class Well512Rng
+    {
+        uint32 state[16];
+        uint32 counter;
+    public:
+        Well512Rng(uint32 _seed);
 
         uint32 operator () ();
     };

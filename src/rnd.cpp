@@ -105,6 +105,31 @@ namespace cn {
 
 
 
+    Well512Rng::Well512Rng(uint32 _seed) :
+        counter(0)
+    {
+        for(int i = 0; i < 16; ++i)
+            state[i] = WangHash()(_seed + i);
+    }
+
+    uint32 Well512Rng::operator () ()
+    {
+        uint32 a, b, c, d;
+        a = state[counter];
+        c = state[(counter + 13) & 15];
+        b = a ^ c ^ (a<<16) ^ (c<<15);
+        c = state[(counter + 9) & 15];
+        c ^= (c>>11);
+        a = state[counter] = b^c;
+        d = a ^ ((a<<5) & 0xDA442D24);
+        counter = (counter + 15) & 15;
+        a = state[counter];
+        state[counter] = a ^ b ^ d ^ (a<<2) ^ (b<<18) ^ (c<<28);
+        return state[counter];
+    }
+
+
+
     static const int PRIMES[32] = {
         2, 3, 5, 7, 11, 13, 17, 19,
         23, 29, 31, 37, 41, 43, 47, 53,
