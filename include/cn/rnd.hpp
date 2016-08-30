@@ -129,6 +129,24 @@ namespace cn {
         uint32 operator () ();
     };
 
+    // Linear Feedback Shift Register RNG from L'Ecuyer 1999:
+    // "Tables of Maximally-Equidistributed Combined LFSR Generators".
+    // State-Size: 16
+    // Period: 2^113 ^= 10^34
+    // L2-Discrepancy 1D: 1.13e-2 / 4.72e-4 / 9.79e-5 / 1.37e-5
+    //                2D: 1.82e-3 / 1.34e-4 / 2.46e-5 / 1.81e-6
+    //                3D: 4.06e-4 / 3.50e-5 / 3.06e-6 / 4.23e-7
+    //                8D: 5.74e-8 / 4.32e-9 / 5.56e-10 / 5.94e-11
+    // Gap-Variance: 1.00e-10
+    class Lfsr113Rng
+    {
+        uint32 state[4];
+    public:
+        Lfsr113Rng(uint32 _seed);
+
+        uint32 operator () ();
+    };
+
     // Medium speed Quasi-RNG.
     // State-Size: 4 Byte
     // L2-Discrepancy 1D: 2.59e-3 / 2.72e-5 / 2.79e-7 / 3.06e-9

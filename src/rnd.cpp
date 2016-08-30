@@ -78,6 +78,33 @@ namespace cn {
 
 
 
+    Lfsr113Rng::Lfsr113Rng(uint32 _seed)
+    {
+        for(int i = 0; i < 4; ++i)
+            state[i] = WangHash()(_seed + i);
+        // The seed must satisfy state > [1,7,15,127]
+        while(state[0] <= 1) state[0] = WangHash()(state[0] + 1);
+        while(state[1] <= 7) state[0] = WangHash()(state[1] + 1);
+        while(state[2] <= 15) state[0] = WangHash()(state[2] + 1);
+        while(state[3] <= 127) state[0] = WangHash()(state[3] + 1);
+    }
+
+    uint32 Lfsr113Rng::operator () ()
+    {
+        uint32 b;
+        b = (((state[0] << 6) ^ state[0]) >> 13);
+        state[0] = (((state[0] & 4294967294) << 18) ^ b);
+        b = (((state[1] << 2) ^ state[1]) >> 27);
+        state[1] = (((state[1] & 4294967288) << 2) ^ b);
+        b = (((state[2] << 13) ^ state[2]) >> 21);
+        state[2] = (((state[2] & 4294967280) << 7) ^ b);
+        b = (((state[3] << 3) ^ state[3]) >> 12);
+        state[3] = (((state[3] & 4294967168) << 13) ^ b);
+        return state[0] ^ state[1] ^ state[2] ^ state[3];
+    }
+
+
+
     static const int PRIMES[32] = {
         2, 3, 5, 7, 11, 13, 17, 19,
         23, 29, 31, 37, 41, 43, 47, 53,
