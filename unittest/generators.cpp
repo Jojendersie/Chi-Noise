@@ -41,8 +41,8 @@ static float l2discrepancy(const double* _samples, int N, int D)
 static float gapVariance(const double* _samples, int N)
 {
     double gap = 1.0 / N;
-    double var = ei::sq( (1.0 + _samples[0] - _samples[99999]) - gap );
-    for(int i = 0; i < 99999; ++i)
+    double var = ei::sq( (1.0 + _samples[0] - _samples[N-1]) - gap );
+    for(int i = 0; i < N-1; ++i)
         var += ei::sq( (_samples[i+1] - _samples[i]) - gap );
     return float(var / (N-1));
 }
