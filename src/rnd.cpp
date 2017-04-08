@@ -47,6 +47,21 @@ namespace cn {
 
 
 
+    MwcRng::MwcRng(uint32 _seed)
+    {
+        state[0] = WangHash()(_seed);
+        state[1] = WangHash()(_seed + 0x100001);
+    }
+
+    uint32 MwcRng::operator()()
+    {
+        state[0] = 36969 * (state[0] & 65535) + (state[0] >> 16);
+        state[1] = 18000 * (state[1] & 65535) + (state[1] >> 16);
+        return (state[0] << 16) + state[1];
+    }
+
+
+
     CmwcRng::CmwcRng(uint32 _seed) :
         counter(LAG-1),
         carry(WangHash()(_seed + 12497) % 809430660)
@@ -277,7 +292,7 @@ namespace cn {
         // The allocation addes another cross application variance.
         void* x = malloc(1);
         free(x);
-        uint32 tid = std::hash<std::thread::id>()(std::this_thread::get_id());
+        uint32 tid = uint32(std::hash<std::thread::id>()(std::this_thread::get_id()));
         uint32 seed = uint32(time(nullptr) + clock() + tid + uint32(x));
         while(seed == 0)
             seed = uint32(time(nullptr) + clock() + tid + uint32(x));

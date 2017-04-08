@@ -106,6 +106,24 @@ namespace cn {
         uint32 operator () ();
     };
 
+    // Multiply with carry RNG after Marsaglia. This is the smaller brother
+    // to the Cmwc generator.
+    // https://www.codeproject.com/Articles/25172/Simple-Random-Number-Generation
+    // State-Size: 8 Byte
+    // L2-Discrepancy 1D: 8.73e-3 / 1.51e-3 / 2.72e-4 / 3.04e-6
+    //                2D: 2.32e-3 / 2.29e-4 / 1.17e-5 / 3.08e-6
+    //                3D: 0.66e-4 / 3.70e-5 / 4.35e-6 / 4.26e-7
+    //                8D: 6.22e-8 / 6.00e-9 / 5.59e-10 / 5.81e-11
+    // Gap-Variance: 9.97e-011
+    class MwcRng
+    {
+        uint32 state[2];
+    public:
+         MwcRng(uint32 _seed);
+
+         uint32 operator () ();
+    };
+
     // Complementary-multiply-with-carry RNG after Marsaglia.
     // https://en.wikipedia.org/wiki/Multiply-with-carry
     // This implementation uses a much smaller state size, as even lag-1 generators are

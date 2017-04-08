@@ -8,7 +8,7 @@ using namespace cn;
 using namespace ei;
 
 // Number of dimensions for discrepancy tests
-const int D = 2;
+const int D = 8;
 
 
 // http://people.mpi-inf.mpg.de/~winzen/Doerr.Gnewuch.Wahlstroem_CalculatingDiscrepancies.pdf
@@ -145,8 +145,10 @@ void test_generators()
     testRNG(rule30, "Rule30");
 
     // Multiply with carry
-    CmwcRng cmcw(stdSeed);
-    testRNG(cmcw, "Cmcw");
+    MwcRng mwc(stdSeed);
+    testRNG(mwc, "mwc");
+    CmwcRng cmwc(stdSeed);
+    testRNG(cmwc, "Cmwc");
 
     // LFSR
     Lfsr113Rng lfsr113(stdSeed);
