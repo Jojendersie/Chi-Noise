@@ -1,4 +1,6 @@
 #include "cn/rnd.hpp"
+#include <ctime>
+#include <thread>
 
 namespace cn {
 
@@ -265,6 +267,21 @@ namespace cn {
         _x = (_x + 0xfd7046c5) + (_x << 3);
         _x = (_x ^ 0xb55a4f09) ^ (_x >> 16);
         return _x;
+    }
+
+    uint32 generateSeed()
+    {
+        // time gives some number, probably in seconds. Clock is added to give some
+        // more short time variance, but it can be very similar on each startup.
+        // The thread ID makes sure different seeds at the same time across threads differ.
+        // The allocation addes another cross application variance.
+        void* x = malloc(1);
+        free(x);
+        uint32 tid = std::hash<std::thread::id>()(std::this_thread::get_id());
+        uint32 seed = uint32(time(nullptr) + clock() + tid + uint32(x));
+        while(seed == 0)
+            seed = uint32(time(nullptr) + clock() + tid + uint32(x));
+        return seed;
     }
 
 } // namespace cn

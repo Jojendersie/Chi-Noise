@@ -284,4 +284,10 @@ namespace cn {
         uint32 operator () (uint32) const;
     };
 
+    // Generate an unpredictable seed from different physical states.
+    // This method is considered relatively slow and high quality.
+    // It includes time(), clock(), thread-id and memory allocation states.
+    // This method guarantees to not output 0.
+    uint32 generateSeed();
+
 } // namespace cn
