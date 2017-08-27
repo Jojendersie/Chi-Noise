@@ -52,7 +52,7 @@ static void testRNG(RNG _generator, const char* _name)
 {
     std::cout << "Testing generator " << _name << ":\n";
     std::vector<double> samples(100000);
-    for(int i=0; i<=100000; i++)
+    for(int i=0; i<100000; i++)
         samples[i] = _generator() / double(0xffffffffull);
     std::cout << "    L2-discrepancy: "
         << l2discrepancy(samples.data(), 10, D) << " / "

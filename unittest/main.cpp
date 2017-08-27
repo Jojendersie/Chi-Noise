@@ -31,7 +31,7 @@ bool writePFM(const char* _name, int _size, const float* _data)
 
 int main()
 {
-  //  test_distributions();
+    test_distributions();
  //   test_fields();
     test_generators();
   //  test_sphsampling();

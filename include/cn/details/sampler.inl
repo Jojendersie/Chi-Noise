@@ -10,6 +10,12 @@ float uniformEx(RndGen& _generator)
     return (_generator() >> 8) / 16777216.0f;
 }
 
+template<typename RndGen, typename T>
+T uniform(RndGen& _generator, T _min, T _max)
+{
+	return static_cast<T>(uint64(_generator()) * (_max - _min) / 0xffffffffull + _min);
+}
+
 template<typename RndGen>
 float gaussian(RndGen& _generator)
 {

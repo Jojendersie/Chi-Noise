@@ -13,6 +13,11 @@ namespace cn {
     template<typename RndGen>
     float uniformEx(RndGen& _generator);
 
+    // Get a uniform sample in [_min, _max] (including _max).
+    // The generated number has at most 32 random bits (using a generator for 32 bit words).
+    template<typename RndGen, typename T>
+    T uniform(RndGen& _generator, T _min, T _max);
+
     // Get a Gaussian (normal distributed) sample in [-oo,oo] with standard
     // deviation 1 and mean 0.
     // This generator consumes two samples.
