@@ -72,7 +72,27 @@ ei::Vec3 direction(RndGen& _generator)
 {
     float cosTheta = uniform(_generator) * 2.0f - 1.0f;
     float sinTheta = sqrt((1.0f - cosTheta) * (1.0f + cosTheta));
-    float phi = uniform(_generator) * 2.0f * ei::PI;
+    float phi = uniformEx(_generator) * 2.0f * ei::PI;
+    return ei::Vec3(sinTheta * sin(phi), sinTheta * cos(phi), cosTheta);
+}
+
+template<typename RndGen>
+ei::Vec3 cosine(RndGen& _generator)
+{
+    float x0 = uniformEx(_generator);
+    float cosTheta = sqrt(x0);        // cos(acos(sqrt(x))) = sqrt(x)
+    float sinTheta = sqrt(1.0f - x0); // sqrt(1-cos(theta)^2)
+    float phi = uniformEx(_generator) * 2.0f * ei::PI;
+    return ei::Vec3(sinTheta * sin(phi), sinTheta * cos(phi), cosTheta);
+}
+
+template<typename RndGen>
+ei::Vec3 cosine(RndGen& _generator, float _exponent)
+{
+    float x0 = uniformEx(_generator);
+    float cosTheta = pow(x0, 1.0f / (_exponent + 1.0f));        // cos(acos(sqrt(x))) = sqrt(x)
+    float sinTheta = sqrt((1.0f - cosTheta) * (1.0f + cosTheta)); // sqrt(1-cos(theta)^2)
+    float phi = uniformEx(_generator) * 2.0f * ei::PI;
     return ei::Vec3(sinTheta * sin(phi), sinTheta * cos(phi), cosTheta);
 }
 

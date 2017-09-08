@@ -51,6 +51,16 @@ namespace cn {
     template<typename RndGen>
     ei::Vec3 direction(RndGen& _generator);
 
+    // Get a cosine distributed normalized direction vector.
+    // This generator consumes two samples.
+    template<typename RndGen>
+    ei::Vec3 cosine(RndGen& _generator);
+
+    // Get a cosine^n distributed normalized direction vector.
+    // This generator consumes two samples.
+    template<typename RndGen>
+    ei::Vec3 cosine(RndGen& _generator, float _exponent);
+
     // Get a uniform distributed sample on a unit disc area
     // This generator consumes two samples.
     template<typename RndGen>
