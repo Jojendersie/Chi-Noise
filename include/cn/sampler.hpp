@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <ei/vector.hpp>
 #include "rnd.hpp"
@@ -49,17 +49,24 @@ namespace cn {
     // Get a uniform distributed normalized direction vector.
     // This generator consumes two samples.
     template<typename RndGen>
-    ei::Vec3 direction(RndGen& _generator);
+    ei::Vec3 dirUniform(RndGen& _generator);
 
     // Get a cosine distributed normalized direction vector.
     // This generator consumes two samples.
     template<typename RndGen>
-    ei::Vec3 cosine(RndGen& _generator);
+    ei::Vec3 dirCosine(RndGen& _generator);
 
     // Get a cosine^n distributed normalized direction vector.
     // This generator consumes two samples.
     template<typename RndGen>
-    ei::Vec3 cosine(RndGen& _generator, float _exponent);
+    ei::Vec3 dirCosine(RndGen& _generator, float _exponent);
+
+    // Get a normalized direction vector distributed after anisotropic
+    // GGX: 1/(pi α_x α_y) * 1/((x⋅h/α_x)² + (y⋅h/α_x)² + (n⋅h)²)².
+    template<typename RndGen>
+    ei::Vec3 dirGGX(RndGen& _generator, const ei::Vec2& _roughness);
+    template<typename RndGen>
+    ei::Vec3 dirGGX(RndGen& _generator, const ei::Vec2& _roughness, float& _pdf);
 
     // Get a uniform distributed sample on a unit disc area
     // This generator consumes two samples.

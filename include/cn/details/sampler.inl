@@ -68,7 +68,7 @@ float exponential(RndGen& _generator, float _lambda)
 }
 
 template<typename RndGen>
-ei::Vec3 direction(RndGen& _generator)
+ei::Vec3 dirUniform(RndGen& _generator)
 {
     float cosTheta = uniform(_generator) * 2.0f - 1.0f;
     float sinTheta = sqrt((1.0f - cosTheta) * (1.0f + cosTheta));
@@ -77,7 +77,7 @@ ei::Vec3 direction(RndGen& _generator)
 }
 
 template<typename RndGen>
-ei::Vec3 cosine(RndGen& _generator)
+ei::Vec3 dirCosine(RndGen& _generator)
 {
     float x0 = uniformEx(_generator);
     float cosTheta = sqrt(x0);        // cos(acos(sqrt(x))) = sqrt(x)
@@ -87,13 +87,48 @@ ei::Vec3 cosine(RndGen& _generator)
 }
 
 template<typename RndGen>
-ei::Vec3 cosine(RndGen& _generator, float _exponent)
+ei::Vec3 dirCosine(RndGen& _generator, float _exponent)
 {
     float x0 = uniformEx(_generator);
     float cosTheta = pow(x0, 1.0f / (_exponent + 1.0f));        // cos(acos(sqrt(x))) = sqrt(x)
     float sinTheta = sqrt((1.0f - cosTheta) * (1.0f + cosTheta)); // sqrt(1-cos(theta)^2)
     float phi = uniformEx(_generator) * 2.0f * ei::PI;
     return ei::Vec3(sinTheta * sin(phi), sinTheta * cos(phi), cosTheta);
+}
+
+template<typename RndGen>
+ei::Vec3 dirGGX(RndGen& _generator, const ei::Vec2& _roughness)
+{
+    float phi = 2.0 * ei::PI * uniformEx(_generator);
+    float xi = uniformEx(_generator);
+    ei::Vec2 e = _roughness * sqrt(xi / (1.0 - xi));
+    return normalize(ei::Vec3(-e.x * cos(phi), -e.y * sin(phi), 1.0));
+}
+
+// Anisotropic GGX: http://graphicrants.blogspot.de/2013/08/specular-brdf-reference.html,
+// https://hal.inria.fr/hal-00942452v1/document "Understanding the Masking-Shadowing Function in Microfacet-Based BRDFs"
+template<typename RndGen>
+ei::Vec3 dirGGX(RndGen& _generator, const ei::Vec2& _roughness, float& _pdf)
+{
+    float phi = 2.0 * ei::PI * uniformEx(_generator);
+    float xi = uniformEx(_generator);
+    float e = sqrt(xi / (1.0 - xi));
+    float slopeX = e * cos(phi); // Partially slope (missing roughness)
+    float slopeY = e * sin(phi);
+
+    float norm = ei::PI * roughness.x * roughness.y;
+    float tmp = 1.0 + slopeX * slopeX + slopeY * slopeY;
+    // PDF of slopes is 1 / (norm * tmp * tmp)
+
+    slopeX *= roughness.x; // Complete slopes
+    slopeY *= roughness.y;
+    ei::Vec3 dir = normalize(ei::Vec3(-slopeX, -slopeY, 1.0));
+
+    // Transform the PDF of slopes into a PDF of normals by the Jacobian
+    // 1 / dot(dir, normal)^3. Here, the normal is (0,0,1).
+    pdf = 1.0 / ei::max(norm * tmp * tmp * dir.z * dir.z * dir.z, 1e-20);
+
+    return dir;
 }
 
 template<typename RndGen>
@@ -107,14 +142,14 @@ ei::Vec2 disc(RndGen& _generator)
 template<typename RndGen>
 ei::Vec3 barycentric(RndGen& _generator)
 {
-	ei::Vec3 coord;
-	coord.x = uniform(_generator);
-	coord.y = uniform(_generator);
-	if(coord.x + coord.y > 1.0f)
-	{
-		coord.x = 1.0f - coord.x;
-		coord.y = 1.0f - coord.y;
-	}
-	coord.z = 1.0f - (coord.x + coord.y);
-	return coord;
+    ei::Vec3 coord;
+    coord.x = uniform(_generator);
+    coord.y = uniform(_generator);
+    if(coord.x + coord.y > 1.0f)
+    {
+        coord.x = 1.0f - coord.x;
+        coord.y = 1.0f - coord.y;
+    }
+    coord.z = 1.0f - (coord.x + coord.y);
+    return coord;
 }
