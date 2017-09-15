@@ -61,12 +61,19 @@ namespace cn {
     template<typename RndGen>
     ei::Vec3 dirCosine(RndGen& _generator, float _exponent);
 
+    // Get a normalized direction vector distributed after isotropic
+    // GGX: 1/(pi α²) * 1/((x⋅h/α)² + (y⋅h/α)² + (n⋅h)²)².
+    template<typename RndGen>
+    ei::Vec3 dirGGX(RndGen& _generator, float _alpha);
+    template<typename RndGen>
+    ei::Vec3 dirGGX(RndGen& _generator, float _alpha, float& _pdf);
+
     // Get a normalized direction vector distributed after anisotropic
-    // GGX: 1/(pi α_x α_y) * 1/((x⋅h/α_x)² + (y⋅h/α_x)² + (n⋅h)²)².
+    // GGX: 1/(pi α_x α_y) * 1/((x⋅h/α_x)² + (y⋅h/α_y)² + (n⋅h)²)².
     template<typename RndGen>
-    ei::Vec3 dirGGX(RndGen& _generator, const ei::Vec2& _roughness);
+    ei::Vec3 dirGGX(RndGen& _generator, const ei::Vec2& _alpha);
     template<typename RndGen>
-    ei::Vec3 dirGGX(RndGen& _generator, const ei::Vec2& _roughness, float& _pdf);
+    ei::Vec3 dirGGX(RndGen& _generator, const ei::Vec2& _alpha, float& _pdf);
 
     // Get a uniform distributed sample on a unit disc area
     // This generator consumes two samples.

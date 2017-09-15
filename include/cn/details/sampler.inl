@@ -96,37 +96,69 @@ ei::Vec3 dirCosine(RndGen& _generator, float _exponent)
     return ei::Vec3(sinTheta * sin(phi), sinTheta * cos(phi), cosTheta);
 }
 
-template<typename RndGen>
-ei::Vec3 dirGGX(RndGen& _generator, const ei::Vec2& _roughness)
-{
-    float phi = 2.0 * ei::PI * uniformEx(_generator);
-    float xi = uniformEx(_generator);
-    ei::Vec2 e = _roughness * sqrt(xi / (1.0 - xi));
-    return normalize(ei::Vec3(-e.x * cos(phi), -e.y * sin(phi), 1.0));
-}
 
 // Anisotropic GGX: http://graphicrants.blogspot.de/2013/08/specular-brdf-reference.html,
 // https://hal.inria.fr/hal-00942452v1/document "Understanding the Masking-Shadowing Function in Microfacet-Based BRDFs"
 template<typename RndGen>
-ei::Vec3 dirGGX(RndGen& _generator, const ei::Vec2& _roughness, float& _pdf)
+ei::Vec3 dirGGX(RndGen& _generator, float _alpha)
 {
-    float phi = 2.0 * ei::PI * uniformEx(_generator);
+    float phi = 2.0f * ei::PI * uniformEx(_generator);
     float xi = uniformEx(_generator);
-    float e = sqrt(xi / (1.0 - xi));
-    float slopeX = e * cos(phi); // Partially slope (missing roughness)
-    float slopeY = e * sin(phi);
+    float e = _alpha * sqrt(xi / (1.0f - xi));
+    return normalize(ei::Vec3(-e * cos(phi), -e * sin(phi), 1.0f));
+}
 
-    float norm = ei::PI * roughness.x * roughness.y;
-    float tmp = 1.0 + slopeX * slopeX + slopeY * slopeY;
+template<typename RndGen>
+ei::Vec3 dirGGX(RndGen& _generator, float _alpha, float& _pdf)
+{
+    float phi = 2.0f * ei::PI * uniformEx(_generator);
+    float xi = uniformEx(_generator);
+    float e = sqrt(xi / (1.0f - xi));
+    float norm = ei::PI * _alpha * _alpha;
+    float tmp = 1.0f + e * e;
     // PDF of slopes is 1 / (norm * tmp * tmp)
 
-    slopeX *= roughness.x; // Complete slopes
-    slopeY *= roughness.y;
-    ei::Vec3 dir = normalize(ei::Vec3(-slopeX, -slopeY, 1.0));
+    e *= _alpha;
+    float slopeX = e * cos(phi);
+    float slopeY = e * sin(phi);
+    ei::Vec3 dir = normalize(ei::Vec3(-slopeX, -slopeY, 1.0f));
 
     // Transform the PDF of slopes into a PDF of normals by the Jacobian
     // 1 / dot(dir, normal)^3. Here, the normal is (0,0,1).
-    pdf = 1.0 / ei::max(norm * tmp * tmp * dir.z * dir.z * dir.z, 1e-20);
+    _pdf = 1.0f / ei::max(norm * tmp * tmp * dir.z * dir.z * dir.z, 1e-20f);
+
+    return dir;
+}
+
+template<typename RndGen>
+ei::Vec3 dirGGX(RndGen& _generator, const ei::Vec2& _alpha)
+{
+    float phi = 2.0f * ei::PI * uniformEx(_generator);
+    float xi = uniformEx(_generator);
+    ei::Vec2 e = _alpha * sqrt(xi / (1.0f - xi));
+    return normalize(ei::Vec3(-e.x * cos(phi), -e.y * sin(phi), 1.0f));
+}
+
+template<typename RndGen>
+ei::Vec3 dirGGX(RndGen& _generator, const ei::Vec2& _alpha, float& _pdf)
+{
+    float phi = 2.0f * ei::PI * uniformEx(_generator);
+    float xi = uniformEx(_generator);
+    float e = sqrt(xi / (1.0f - xi));
+    float slopeX = e * cos(phi); // Partially slope (missing roughness)
+    float slopeY = e * sin(phi);
+
+    float norm = ei::PI * _alpha.x * _alpha.y;
+    float tmp = 1.0f + slopeX * slopeX + slopeY * slopeY;
+    // PDF of slopes is 1 / (norm * tmp * tmp)
+
+    slopeX *= _alpha.x; // Complete slopes
+    slopeY *= _alpha.y;
+    ei::Vec3 dir = normalize(ei::Vec3(-slopeX, -slopeY, 1.0f));
+
+    // Transform the PDF of slopes into a PDF of normals by the Jacobian
+    // 1 / dot(dir, normal)^3. Here, the normal is (0,0,1).
+    _pdf = 1.0f / ei::max(norm * tmp * tmp * dir.z * dir.z * dir.z, 1e-20f);
 
     return dir;
 }
