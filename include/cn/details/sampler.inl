@@ -164,6 +164,47 @@ ei::Vec3 dirGGX(RndGen& _generator, const ei::Vec2& _alpha, float& _pdf)
 }
 
 template<typename RndGen>
+ei::Vec3 dirHenyeyGreenstein(RndGen& _generator, float _g, const ei::Vec3& _incident)
+{
+    // See e.g. PBRT book page 899.
+    float phi = 2.0f * ei::PI * uniformEx(_generator);
+    float cosTheta;
+    if(abs(_g) < 1e-3f) {
+        cosTheta = 1.0f - 2.0f * uniformEx(_generator);
+    } else {
+        float sqTerm = (1.0f - _g * _g) / (1.0f - _g + 2.0f * _g * uniformEx(_generator));
+        cosTheta = (1.0f + _g * _g - sqTerm * sqTerm) / (2.0f * _g);
+    }
+    float sinTheta = sqrt((1.0f - cosTheta) * (1.0f + cosTheta));
+    ei::Mat3x3 localSpace = ei::basis(_incident);
+    return _incident * cosTheta + transpose((sin(phi) * sinTheta) * localSpace(1) + (cos(phi) * sinTheta) * localSpace(2));
+}
+
+template<typename RndGen>
+ei::Vec3 dirHenyeyGreenstein(RndGen& _generator, float _g, const ei::Vec3& _incident, float& _pdf)
+{
+    // See e.g. PBRT book page 899.
+    float phi = 2.0f * ei::PI * uniformEx(_generator);
+    float cosTheta;
+    if(abs(_g) < 1e-3f) {
+        cosTheta = 1.0f - 2.0f * uniformEx(_generator);
+        _pdf = 1.0f / (4.0f * ei::PI);
+    } else {
+        float sqTerm = (1.0f - _g * _g) / (1.0f - _g + 2.0f * _g * uniformEx(_generator));
+        cosTheta = (1.0f + _g * _g - sqTerm * sqTerm) / (2.0f * _g);
+        // Reinserting cosTheta into the phase function:
+        // 1.0f / (4.0f * ei::PI) * (1.0f - _g * _g) / (tmp * sqrt(tmp))
+        // tmp = 1.0f + _g * _g - 2.0f * _g * cosTheta;
+        //   --> tmp = sqTerm * sqTerm;
+        //   --> 1.0f / (4.0f * ei::PI) * (1.0f - _g * _g) / (sqTerm * sqTerm * sqTerm)
+        _pdf = 1.0f / (4.0f * ei::PI) * (1.0f - _g * _g) / (sqTerm * sqTerm * sqTerm);
+    }
+    float sinTheta = sqrt((1.0f - cosTheta) * (1.0f + cosTheta));
+    ei::Mat3x3 localSpace = ei::basis(_incident);
+    return _incident * cosTheta + transpose((sin(phi) * sinTheta) * localSpace(1) + (cos(phi) * sinTheta) * localSpace(2));
+}
+
+template<typename RndGen>
 ei::Vec2 disc(RndGen& _generator)
 {
     float angle = _generator() * 1.46291808e-9f;

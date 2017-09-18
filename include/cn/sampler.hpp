@@ -75,6 +75,13 @@ namespace cn {
     template<typename RndGen>
     ei::Vec3 dirGGX(RndGen& _generator, const ei::Vec2& _alpha, float& _pdf);
 
+    // Get a normalized direction vector scattered from an incident vector
+    // by the Henyey-Greenstein phase function
+    template<typename RndGen>
+    ei::Vec3 dirHenyeyGreenstein(RndGen& _generator, float _g, const ei::Vec3& _incident);
+    template<typename RndGen>
+    ei::Vec3 dirHenyeyGreenstein(RndGen& _generator, float _g, const ei::Vec3& _incident, float& _pdf);
+
     // Get a uniform distributed sample on a unit disc area
     // This generator consumes two samples.
     template<typename RndGen>
