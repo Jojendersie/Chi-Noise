@@ -37,7 +37,7 @@ void test_distributions()
     if(uniform(ming, 3, 23869071) != 3)    std::cerr << "FAILED: uniform([3, 23869071]) does not generate 3 as expected.\n";
     if(uniform(maxg, 3, 23869071) != 23869071)    std::cerr << "FAILED: uniform([3, 23869071]) does not generate 23869071 as expected.\n";
 
-    if(lensq(direction(ming)) > 1.0f)    std::cerr << "FAILED: direction() generated a too long vector.\n";
+    if(lensq(dirUniform(ming)) > 1.0f)    std::cerr << "FAILED: direction() generated a too long vector.\n";
 
     // Test normal distribution
     float mean = 0.0f, var = 0.0f;

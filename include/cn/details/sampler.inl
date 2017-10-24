@@ -1,19 +1,31 @@
 template<typename RndGen>
 float uniform(RndGen& _generator)
 {
-    return (_generator() >> 8) / 16777215.0f;
+    return _generator() / 4294967295.0f;
 }
 
 template<typename RndGen>
 float uniformEx(RndGen& _generator)
 {
-    return (_generator() >> 8) / 16777216.0f;
+    return _generator() / 4294967810.0f; // successor(float(0xffffffff));
 }
 
 template<typename RndGen, typename T>
 T uniform(RndGen& _generator, T _min, T _max)
 {
-	return static_cast<T>(uint64(_generator()) * (_max - _min) / 0xffffffffull + _min);
+    return static_cast<T>((uint64(_generator()) * 2 + 1) * (_max - _min) / 0x1fffffffeull + _min);
+    //return static_cast<T>(_generator() % (_max - _min + 1) + _min);
+}
+
+template<typename RndGen>
+float uniform(RndGen& _generator, float _min, float _max)
+{
+    return static_cast<float>(_generator() / 4294967295.0 * (_max - _min) + _min);
+}
+template<typename RndGen>
+double uniform(RndGen& _generator, double _min, double _max)
+{
+	return _generator() / 4294967295.0 * (_max - _min) + _min;
 }
 
 template<typename RndGen>
