@@ -1,5 +1,8 @@
 ﻿#pragma once
 
+#include <vector>
+#include <algorithm>
+#include <memory>
 #include <ei/vector.hpp>
 #include "rnd.hpp"
 
@@ -94,5 +97,116 @@ namespace cn {
 
     // include inline implementation
 #   include "details/sampler.inl"
+
+    class DiscreteFunction1D
+    {
+    public:
+        // _func: A function specified by discrete samples. The ownership of the memory is
+        //    taken and its content will be converted to a prefixsum array.
+        //    A function should not have more than a few thousand entries. Otherwise numeric
+        //    will cause the loss of small samples.
+        DiscreteFunction1D(std::vector<float> _func) :
+            m_cdf(std::move(_func))
+        {
+            float sum = 0.0f;
+            //int n = int(_func.size()); // Normalize by sample number to map to [0,1]
+            for(auto & it : m_cdf)
+            {
+                sum += it;
+                it = sum;
+            }
+        }
+
+        // Get a random index of the original function (consumes one random number).
+        template<typename RndGen>
+        int sampleDiscrete(RndGen & _generator) const
+        {
+            float x = uniform(_generator, 0.0f, m_cdf.back());
+            auto it = std::lower_bound(m_cdf.begin(), m_cdf.end(), x);
+            return int(it - m_cdf.begin());
+        }
+
+        // Sample a value in [0,1] continuously (consumes one random number).
+        // _pdf: Optional return value for the probability density value at the sampled
+        //     position.
+        template<typename RndGen>
+        float sample(RndGen & _generator, float * _pdf = nullptr, int * _off = nullptr) const
+        {
+            float x = uniform(_generator, 0.0f, m_cdf.back());
+            auto it = std::lower_bound(m_cdf.begin(), m_cdf.end(), x);
+            if(_off)
+                *_off = int(it - m_cdf.begin());
+            float v0 = it == m_cdf.begin() ? 0.0f : *(it-1);
+            float v1 = *it;
+            if(_pdf)
+                *_pdf = (v1 - v0) * m_cdf.size() / m_cdf.back();
+            return (x - v0) / (v1 - v0); // Inverse of linear interpolation
+        }
+
+        // Integral value over the interval [0,1].
+        float integral() const { return m_cdf.back() / m_cdf.size(); }
+
+    private:
+        std::vector<float> m_cdf; // Integral over the function without any normalization.
+    };
+
+    class DiscreteFunction2D
+    {
+    public:
+        // _func: A 2D function of discrete values. The inner vectors are called
+        //     rows and may have different lengths.
+        //    A row should not have more than a few thousand entries. Otherwise numeric
+        //    will cause the loss of small samples. Also, there shouldn't be to many rows.
+        DiscreteFunction2D(std::vector<std::vector<float>> _func) :
+            m_colPDF(nullptr)
+        {
+            std::vector<float> m_rowIntegrals;
+            m_rowPDFs.reserve(_func.size());
+            m_rowIntegrals.reserve(_func.size());
+            for(auto & row : _func)
+            {
+                m_rowPDFs.push_back(std::move(row));
+                m_rowIntegrals.push_back(m_rowPDFs.back().integral());
+            }
+            m_colPDF = std::make_unique<DiscreteFunction1D>(std::move(m_rowIntegrals));
+        }
+
+        // Get a random index of the original function (consumes two random numbers).
+        template<typename RndGen>
+        ei::IVec2 sampleDiscrete(RndGen & _generator) const
+        {
+            int y = m_colPDF->sampleDiscrete(_generator);
+            return ei::IVec2(m_rowPDFs[y].sampleDiscrete(_generator), y);
+        }
+
+        // Sample a value in [0,1]^2 continuously (consumes two random numbers).
+        // _pdf: Optional return value for the probability density value at the sampled
+        //     position.
+        template<typename RndGen>
+        ei::Vec2 sample(RndGen & _generator, float * _pdf = nullptr, ei::IVec2 * _off = nullptr) const
+        {
+            ei::IVec2 off;
+            if(!_off) _off = & off;
+            if(_pdf)
+            {
+                float pdfX, pdfY;
+                float y = m_colPDF->sample(_generator, &pdfY, &_off->y);
+                float x = m_rowPDFs[_off->y].sample(_generator, &pdfX, &_off->x);
+                *_pdf = pdfX * pdfY;
+                return ei::Vec2(x,y);
+            } else {
+                float y = m_colPDF->sample(_generator, nullptr, &_off->y);
+                float x = m_rowPDFs[_off->y].sample(_generator, nullptr, &_off->x);
+                return ei::Vec2(x,y);
+            }
+        }
+
+        // Integral value over the interval area [0,1]^2.
+        float integral() const { return m_colPDF->integral(); }
+
+    private:
+        std::vector<DiscreteFunction1D> m_rowPDFs;
+        std::unique_ptr<DiscreteFunction1D> m_colPDF;
+    };
 
 } // namespace cn

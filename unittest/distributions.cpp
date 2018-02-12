@@ -91,6 +91,25 @@ void test_distributions()
     var /= 999999;
     if(!approx(mean, 0.2f, 1e-3f))     std::cerr << "FAILED: exponential() samples have a wrong mean.\n";
     if(!approx(var, 0.04f, 1e-3f))     std::cerr << "FAILED: exponential() samples have a wrong variance.\n";
+
+    // Test discrete function samplers
+    float pdf;
+    DiscreteFunction1D d1(std::vector<float>{1.3f, 1.3f, 1.3f});
+    for(int i = 0; i < 10; ++i) // Test multiple samples
+    {
+        if(d1.sampleDiscrete(xorshiftRng) >= 3) std::cerr << "FAILED: DiscreteFunction1D::sampleDiscrete produced an invalid index.\n";
+        float x = d1.sample(xorshiftRng, & pdf);
+        if(x < 0.0f || x > 1.0f) std::cerr << "FAILED: DiscreteFunction1D::sample out of interval.\n";
+        if(!approx(pdf, 1.0f)) std::cerr << "FAILED: DiscreteFunction1D::sample pdf value wrong.\n";
+    }
+    if(d1.sampleDiscrete(ming) >= 3) std::cerr << "FAILED: DiscreteFunction1D::sampleDiscrete produced an invalid index (ming).\n";
+    if(d1.sampleDiscrete(maxg) >= 3) std::cerr << "FAILED: DiscreteFunction1D::sampleDiscrete produced an invalid index (maxg).\n";
+    float x = d1.sample(ming, & pdf);
+    if(x < 0.0f || x > 1.0f) std::cerr << "FAILED: DiscreteFunction1D::sample out of interval (ming).\n";
+    if(!approx(pdf, 1.0f)) std::cerr << "FAILED: DiscreteFunction1D::sample pdf value wrong (ming).\n";
+    x = d1.sample(maxg, & pdf);
+    if(x < 0.0f || x > 1.0f) std::cerr << "FAILED: DiscreteFunction1D::sample out of interval (maxg).\n";
+    if(!approx(pdf, 1.0f)) std::cerr << "FAILED: DiscreteFunction1D::sample pdf value wrong (maxg).\n";
 }
 
 
