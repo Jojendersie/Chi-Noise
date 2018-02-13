@@ -134,13 +134,15 @@ namespace cn {
         {
             float x = uniform(_generator, 0.0f, m_cdf.back());
             auto it = std::lower_bound(m_cdf.begin(), m_cdf.end(), x);
+            int o = int(it - m_cdf.begin());
             if(_off)
-                *_off = int(it - m_cdf.begin());
-            float v0 = it == m_cdf.begin() ? 0.0f : *(it-1);
+                *_off = o;
+            float v0 = o == 0 ? 0.0f : *(it-1);
             float v1 = *it;
             if(_pdf)
                 *_pdf = (v1 - v0) * m_cdf.size() / m_cdf.back();
-            return (x - v0) / (v1 - v0); // Inverse of linear interpolation
+            x = (x - v0) / (v1 - v0); // Inverse of linear interpolation
+            return (o + x) / m_cdf.size();
         }
 
         // Integral value over the interval [0,1].
