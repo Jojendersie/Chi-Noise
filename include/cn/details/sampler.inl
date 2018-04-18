@@ -169,8 +169,8 @@ ei::Vec3 dirGGX(RndGen& _generator, const ei::Vec2& _alpha, float& _pdf)
     ei::Vec3 dir = normalize(ei::Vec3(-slopeX, -slopeY, 1.0f));
 
     // Transform the PDF of slopes into a PDF of normals by the Jacobian
-    // 1 / dot(dir, normal)^3. Here, the normal is (0,0,1).
-    _pdf = 1.0f / ei::max(norm * tmp * tmp * dir.z * dir.z * dir.z, 1e-20f);
+    // 1 / dot(dir, normal)^4. Here, the normal is (0,0,1).
+    _pdf = 1.0f / ei::max(norm * tmp * tmp * dir.z * dir.z * dir.z * dir.z, 1e-20f);
 
     return dir;
 }
