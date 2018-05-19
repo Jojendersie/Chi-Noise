@@ -59,7 +59,7 @@ ei::Vec<float, N> gaussian(RndGen& _generator, const ei::Matrix<float, N, N>& _s
     {
         double u0 = _generator() / 4294967295.0;
         double u1 = _generator() / 4294967295.0;
-        double R = sqrt(max(0.0, -2.0 * log(u0+1.0e-323)));
+        double R = sqrt(ei::max(0.0, -2.0 * log(u0+1.0e-323)));
         u1 *= 6.283185307179586476925286766559;
         res[i]   = float(R * cos(u1));
         res[i+1] = float(R * sin(u1));

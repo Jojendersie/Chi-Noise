@@ -2,6 +2,12 @@
 //#define MAP2D(x,y) (x ^ _generator(5 * y))
 //#define MAP3D(x,y,z) (x ^ _generator((5 * y) ^ _generator(-3 * z)))
 
+namespace cndetails {
+// Helper: For an unknown reason (bug? cpp-standard?) vector.subcol<0,N-1>() cannot be called
+// inside the following template environments. This helper method emulates the required member function.
+template<typename T, int N>
+const ei::Vec<T, N-1> & prefix(const ei::Vec<T,N> & _v) { return *reinterpret_cast<const ei::Vec<T, N-1> &>(&_v); }
+} // namespace cndetails
 
 // Recursion end
 template<typename RndGen>
@@ -14,12 +20,13 @@ float valueNoise(RndGen& _generator, ei::Vec<float,0> _x, ei::Vec<int,0> _freque
 template<typename RndGen, int N>
 float valueNoise(RndGen& _generator, const ei::Vec<float,N>& _x, const ei::Vec<int,N>& _frequency, Interpolation _interp, uint32 _seed)
 {
+    using namespace cndetails;
     float x = _x[N-1] * _frequency[N-1];
     int ix = ei::floor(x);
     switch(_interp)
     {
     case cn::Interpolation::POINT:
-        return valueNoise(_generator, _x.subcol<0,N-1>(), _frequency.subcol<0,N-1>(), _interp, _generator(_seed ^ ei::mod(ix, _frequency[N-1])));
+        return valueNoise(_generator, prefix(_x), prefix(_frequency), _interp, _generator(_seed ^ ei::mod(ix, _frequency[N-1])));
     case cn::Interpolation::LINEAR:
     case cn::Interpolation::SMOOTHSTEP:
     case cn::Interpolation::SMOOTHERSTEP: {
@@ -28,8 +35,8 @@ float valueNoise(RndGen& _generator, const ei::Vec<float,N>& _x, const ei::Vec<i
         else if(_interp == cn::Interpolation::SMOOTHERSTEP) f = ei::smootherstep(f);
         ix = ei::mod(ix, _frequency[N-1]);
         return ei::lerp(
-            valueNoise(_generator, _x.subcol<0,N-1>(), _frequency.subcol<0,N-1>(), _interp, _generator(_seed ^ ix)),
-            valueNoise(_generator, _x.subcol<0,N-1>(), _frequency.subcol<0,N-1>(), _interp, _generator(_seed ^ ei::mod(ix+1, _frequency[N-1]))),
+            valueNoise(_generator, prefix(_x), prefix(_frequency), _interp, _generator(_seed ^ ix)),
+            valueNoise(_generator, prefix(_x), prefix(_frequency), _interp, _generator(_seed ^ ei::mod(ix+1, _frequency[N-1]))),
             f );
     }
     }

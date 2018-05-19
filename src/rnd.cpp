@@ -40,7 +40,7 @@ namespace cn {
         state[1] = ap ^ (state[1] | an);
 
         // Extract 32 bits from the 122 possible bits.
-        uint64 x = state[0] & 0x2111211112122112 | state[1] & 0x1222122221211221;
+        uint64 x = (state[0] & 0x2111211112122112) | (state[1] & 0x1222122221211221);
         // Now the pattern of x is 00xx 00xx. Pack that together...
         return uint32(x | (x >> 30));
     }
