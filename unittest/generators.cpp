@@ -109,7 +109,7 @@ float avalanche(Hasher _hash, uint32 N)
         for(int j = 0; j < 32; ++j)
         {
             float bitAv = bins[i*32+j] / target; // == 1.0f in best case, [0, 2]
-            avalanche += 1.0f - abs(bitAv - 1.0f);
+            avalanche += 1.0f - ei::abs(bitAv - 1.0f);
 //            file << bins[i*32+j] / target << "; ";
         }
 //	    file << '\n';

@@ -110,6 +110,39 @@ void test_distributions()
     x = d1.sample(maxg, & pdf);
     if(x < 0.0f || x > 1.0f) std::cerr << "FAILED: DiscreteFunction1D::sample out of interval (maxg).\n";
     if(!approx(pdf, 1.0f)) std::cerr << "FAILED: DiscreteFunction1D::sample pdf value wrong (maxg).\n";
+
+    // The following are mere compiler test, because it is hard to check the
+    // true distributions.
+    for(float a = 0.0f; a <= 1.0f; a+=0.1f)
+    {
+        Vec3 dirOut = dirGGX(ming, a);
+        if(isnan(dirOut.x)) std::cerr << "FAILED: dirGGX produces NaN directions.\n";
+        dirOut = dirGGX(maxg, a);
+        if(isnan(dirOut.x)) std::cerr << "FAILED: dirGGX produces NaN directions.\n";
+        dirOut = dirGGX(xorshiftRng, a);
+        if(isnan(dirOut.x)) std::cerr << "FAILED: dirGGX produces NaN directions.\n";
+
+        dirOut = dirGGX(ming, a, pdf);
+        if(isnan(dirOut.x) || isnan(pdf)) std::cerr << "FAILED: dirGGX produces NaN directions or pdf.\n";
+        dirOut = dirGGX(maxg, a, pdf);
+        if(isnan(dirOut.x) || isnan(pdf)) std::cerr << "FAILED: dirGGX produces NaN directions or pdf.\n";
+        dirOut = dirGGX(xorshiftRng, a, pdf);
+        if(isnan(dirOut.x) || isnan(pdf)) std::cerr << "FAILED: dirGGX produces NaN directions or pdf.\n";
+
+        dirOut = dirBeckmannSpizzichino(ming, a);
+        if(isnan(dirOut.x)) std::cerr << "FAILED: dirBeckmannSpizzichino produces NaN directions.\n";
+        dirOut = dirGGX(maxg, a);
+        if(isnan(dirOut.x)) std::cerr << "FAILED: dirBeckmannSpizzichino produces NaN directions.\n";
+        dirOut = dirGGX(xorshiftRng, a);
+        if(isnan(dirOut.x)) std::cerr << "FAILED: dirBeckmannSpizzichino produces NaN directions.\n";
+
+        dirOut = dirBeckmannSpizzichino(ming, a, pdf);
+        if(isnan(dirOut.x) || isnan(pdf)) std::cerr << "FAILED: dirBeckmannSpizzichino produces NaN directions or pdf.\n";
+        dirOut = dirBeckmannSpizzichino(maxg, a, pdf);
+        if(isnan(dirOut.x) || isnan(pdf)) std::cerr << "FAILED: dirBeckmannSpizzichino produces NaN directions or pdf.\n";
+        dirOut = dirBeckmannSpizzichino(xorshiftRng, a, pdf);
+        if(isnan(dirOut.x) || isnan(pdf)) std::cerr << "FAILED: dirBeckmannSpizzichino produces NaN directions or pdf.\n";
+    }
 }
 
 

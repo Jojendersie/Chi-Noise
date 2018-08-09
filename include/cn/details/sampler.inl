@@ -1,4 +1,4 @@
-template<typename RndGen>
+﻿template<typename RndGen>
 float uniform(RndGen& _generator)
 {
     return _generator() / 4294967295.0f;
@@ -174,6 +174,75 @@ ei::Vec3 dirGGX(RndGen& _generator, const ei::Vec2& _alpha, float& _pdf)
 
     return dir;
 }
+
+
+template<typename RndGen>
+ei::Vec3 dirBeckmannSpizzichino(RndGen& _generator, float _alpha)
+{
+    // See dirBeckmannSpizzichino(RndGen&, Vec2&, float&) for details.
+    float phi = 2 * ei::PI * uniformEx(_generator);
+    float xi = uniform(_generator) + 1e-20f;
+    float ea = _alpha * sqrt(-log(xi));
+    float slopeX = ea * cos(phi);
+    float slopeY = ea * sin(phi);
+    ei::Vec3 dir = normalize(ei::Vec3(-slopeX, -slopeY, 1.0f));
+
+    return dir;
+}
+
+template<typename RndGen>
+ei::Vec3 dirBeckmannSpizzichino(RndGen& _generator, float _alpha, float& _pdf)
+{
+    // See dirBeckmannSpizzichino(RndGen&, Vec2&, float&) for details.
+    float phi = 2 * ei::PI * uniformEx(_generator);
+    float xi = uniform(_generator) + 1e-20f;
+    float ea = _alpha * sqrt(-log(xi));
+    float slopeX = ea * cos(phi);
+    float slopeY = ea * sin(phi);
+    ei::Vec3 dir = normalize(ei::Vec3(-slopeX, -slopeY, 1.0f));
+
+    _pdf = xi / ei::max((ei::PI * _alpha * _alpha * dir.z * dir.z * dir.z, 1e-20f);
+
+    return dir;
+}
+
+template<typename RndGen>
+ei::Vec3 dirBeckmannSpizzichino(RndGen& _generator, const ei::Vec2& _alpha)
+{
+    // See dirBeckmannSpizzichino(RndGen&, Vec2&, float&) for details.
+    float phi = 2 * ei::PI * uniformEx(_generator);
+    float xi = uniform(_generator) + 1e-20f;
+    float e = sqrt(-log(xi));
+    float slopeX = e * cos(phi);
+    float slopeY = e * sin(phi);
+    ei::Vec3 dir = normalize(ei::Vec3(-_alpha.x * slopeX, -_alpha.y * slopeY, 1.0f));
+
+    return dir;
+}
+
+template<typename RndGen>
+ei::Vec3 dirBeckmannSpizzichino(RndGen& _generator, const ei::Vec2& _alpha, float& _pdf)
+{
+    // Using slope based sampling (Heitz 2014 Importance Sampling Microfacet-Based BSDFs
+    // Using the Distribution of Visible Normals, Supplemental 2).
+    // The exponential in the Beck. distr. is sampled using the Box-Muller transform.
+    float phi = 2 * ei::PI * uniformEx(_generator);
+    float xi = uniform(_generator) + 1e-20f;
+    float e = sqrt(-log(xi));
+    float slopeX = e * cos(phi);
+    float slopeY = e * sin(phi);
+    ei::Vec3 dir = normalize(ei::Vec3(-_alpha.x * slopeX, -_alpha.y * slopeY, 1.0f));
+
+    // PDF = 1/(π α_x α_y) exp(-(sX/α_x)²-(s/α_y)²) / (n⋅h)³
+    //     = 1/(π α_x α_y) exp(-(slopeX² + slopeY²)) / (n⋅h)³
+    //     = 1/(π α_x α_y) exp(-e²) / (n⋅h)³
+    //     = 1/(π α_x α_y) xi / (n⋅h)³
+    // The / (n⋅h)³ is from the Jacobian slope space -> normalized direction
+    _pdf = xi / ei::max((ei::PI * _alpha.x * _alpha.y * dir.z * dir.z * dir.z, 1e-20f);
+
+    return dir;
+}
+
 
 template<typename RndGen>
 ei::Vec3 dirHenyeyGreenstein(RndGen& _generator, float _g, const ei::Vec3& _incident)
