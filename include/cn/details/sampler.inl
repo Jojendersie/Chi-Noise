@@ -201,7 +201,7 @@ ei::Vec3 dirBeckmannSpizzichino(RndGen& _generator, float _alpha, float& _pdf)
     float slopeY = ea * sin(phi);
     ei::Vec3 dir = normalize(ei::Vec3(-slopeX, -slopeY, 1.0f));
 
-    _pdf = xi / ei::max((ei::PI * _alpha * _alpha * dir.z * dir.z * dir.z, 1e-20f);
+    _pdf = xi / ei::max(ei::PI * _alpha * _alpha * dir.z * dir.z * dir.z, 1e-20f);
 
     return dir;
 }
@@ -238,7 +238,7 @@ ei::Vec3 dirBeckmannSpizzichino(RndGen& _generator, const ei::Vec2& _alpha, floa
     //     = 1/(π α_x α_y) exp(-e²) / (n⋅h)³
     //     = 1/(π α_x α_y) xi / (n⋅h)³
     // The / (n⋅h)³ is from the Jacobian slope space -> normalized direction
-    _pdf = xi / ei::max((ei::PI * _alpha.x * _alpha.y * dir.z * dir.z * dir.z, 1e-20f);
+    _pdf = xi / ei::max(ei::PI * _alpha.x * _alpha.y * dir.z * dir.z * dir.z, 1e-20f);
 
     return dir;
 }
