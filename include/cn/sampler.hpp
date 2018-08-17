@@ -64,30 +64,40 @@ namespace cn {
     template<typename RndGen>
     ei::Vec3 dirCosine(RndGen& _generator, float _exponent);
 
-    // Get a normalized direction vector distributed after isotropic
-    // GGX: 1/(π α²) * 1/((x⋅h/α)² + (y⋅h/α)² + (n⋅h)²)².
+    // Get a normalized direction vector distributed after isotropic GGX NDF
+    // D_GGX⋅(n⋅h) where
+    // D_GGX = 1/(π α²) * 1/((x⋅h/α)² + (y⋅h/α)² + (n⋅h)²)².
+    //       = 1/(π α²) * 1/((n⋅h)² + (1-(n⋅h)²)/α²)².
+    // The optional returned PDF is the sample distribution D_GGX⋅(n⋅h).
     template<typename RndGen>
     ei::Vec3 dirGGX(RndGen& _generator, float _alpha);
     template<typename RndGen>
     ei::Vec3 dirGGX(RndGen& _generator, float _alpha, float& _pdf);
 
-    // Get a normalized direction vector distributed after anisotropic
-    // GGX: 1/(π α_x α_y) * 1/((x⋅h/α_x)² + (y⋅h/α_y)² + (n⋅h)²)².
+    // Get a normalized direction vector distributed after anisotropic GGX NDF
+    // D_GGXa⋅(n⋅h) where
+    // D_GGXa = 1/(π α_x α_y) * 1/((x⋅h/α_x)² + (y⋅h/α_y)² + (n⋅h)²)².
+    // The optional returned PDF is the sample distribution D_GGXa⋅(n⋅h).
     template<typename RndGen>
     ei::Vec3 dirGGX(RndGen& _generator, const ei::Vec2& _alpha);
     template<typename RndGen>
     ei::Vec3 dirGGX(RndGen& _generator, const ei::Vec2& _alpha, float& _pdf);
 
-    // Get a normalized direction vector with isotropic Beckmann-Spizzichino
-    // distribution: 1/(π α² (n⋅h)³) exp(((n⋅h)²-1) / (α² (n⋅h)²))
+    // Get a normalized direction vector distributed after isotropic
+    // Beckmann-Spizzichino NDF D_B⋅(n⋅h) where
+    // D_B = 1/(π α² (n⋅h)⁴) exp(((n⋅h)²-1) / (α² (n⋅h)²))
+    // The optional returned PDF is the sample distribution D_B⋅(n⋅h).
     template<typename RndGen>
     ei::Vec3 dirBeckmannSpizzichino(RndGen& _generator, float _alpha);
     template<typename RndGen>
     ei::Vec3 dirBeckmannSpizzichino(RndGen& _generator, float _alpha, float& _pdf);
 
-    // Get a normalized direction vector with anisotropic Beckmann-Spizzichino
-    // distribution: 1/(π α_x α_y (n⋅h)³) exp(-tan(acos(n⋅h))² * ((x⋅h/α_x)² + (y⋅h/α_y)²))
-    // = 1/(π α_x α_y (n⋅h)³) exp(((n⋅h)²-1) / (n⋅h)² * ((x⋅h/α_x)² + (y⋅h/α_y)²))
+    // Get a normalized direction vector distributed after anisotropic
+    // Beckmann-Spizzichino NDF D_B⋅(n⋅h) where
+    // D_B = 1/(π α_x α_y (n⋅h)⁴) exp(-tan(acos(n⋅h))² * ((x⋅h/α_x)² + (y⋅h/α_y)²) / (1-(n⋅h)²))
+    //     = 1/(π α_x α_y (n⋅h)⁴) exp(((n⋅h)²-1) / (n⋅h)² * ((x⋅h/α_x)² + (y⋅h/α_y)²) / (1-(n⋅h)²))
+    //     = 1/(π α_x α_y (n⋅h)⁴) exp(-((x⋅h/α_x)² + (y⋅h/α_y)²) / (n⋅h)²)
+    // The optional returned PDF is the sample distribution D_B⋅(n⋅h).
     template<typename RndGen>
     ei::Vec3 dirBeckmannSpizzichino(RndGen& _generator, const ei::Vec2& _alpha);
     template<typename RndGen>
