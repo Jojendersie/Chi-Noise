@@ -79,11 +79,11 @@ namespace cn {
     // Gap-Variance: 1.00e-10
     class Xorshift32Rng
     {
-        uint32 state;
+        ei::uint32 state;
     public:
-        Xorshift32Rng(uint32 _seed);
+        Xorshift32Rng(ei::uint32 _seed);
 
-        uint32 operator () ();
+        ei::uint32 operator () ();
     };
 
     // Cellular automaton RNG after Wolfram's Rule 30.
@@ -99,11 +99,11 @@ namespace cn {
     // Gap-Variance: 9.94e-9
     class Rule30CARng
     {
-        uint64 state[2];
+        ei::uint64 state[2];
     public:
-        Rule30CARng(uint32 _seed);
+        Rule30CARng(ei::uint32 _seed);
 
-        uint32 operator () ();
+        ei::uint32 operator () ();
     };
 
     // Multiply with carry RNG after Marsaglia. This is the smaller brother
@@ -117,11 +117,11 @@ namespace cn {
     // Gap-Variance: 9.97e-011
     class MwcRng
     {
-        uint32 state[2];
+        ei::uint32 state[2];
     public:
-         MwcRng(uint32 _seed);
+         MwcRng(ei::uint32 _seed);
 
-         uint32 operator () ();
+         ei::uint32 operator () ();
     };
 
     // Complementary-multiply-with-carry RNG after Marsaglia.
@@ -138,13 +138,13 @@ namespace cn {
     class CmwcRng
     {
         enum { LAG = 4 };
-        uint32 state[LAG];
-        uint32 counter;
-        uint32 carry;
+        ei::uint32 state[LAG];
+        ei::uint32 counter;
+        ei::uint32 carry;
     public:
-        CmwcRng(uint32 _seed);
+        CmwcRng(ei::uint32 _seed);
 
-        uint32 operator () ();
+        ei::uint32 operator () ();
     };
 
     // Linear Feedback Shift Register RNG from L'Ecuyer 1999:
@@ -158,11 +158,11 @@ namespace cn {
     // Gap-Variance: 1.00e-10
     class Lfsr113Rng
     {
-        uint32 state[4];
+        ei::uint32 state[4];
     public:
-        Lfsr113Rng(uint32 _seed);
+        Lfsr113Rng(ei::uint32 _seed);
 
-        uint32 operator () ();
+        ei::uint32 operator () ();
     };
 
     // WELL = Well Equidistributed Long-period Linear from Panneton,
@@ -178,12 +178,12 @@ namespace cn {
     // Gap-Variance: 1.01e-10
     class Well512Rng
     {
-        uint32 state[16];
-        uint32 counter;
+        ei::uint32 state[16];
+        ei::uint32 counter;
     public:
-        Well512Rng(uint32 _seed);
+        Well512Rng(ei::uint32 _seed);
 
-        uint32 operator () ();
+        ei::uint32 operator () ();
     };
 
     // Medium speed Quasi-RNG.
@@ -197,13 +197,13 @@ namespace cn {
     // prime bases.
     class HaltonRng
     {
-        uint32 numBases;
-        uint32 counter;
+        ei::uint32 numBases;
+        ei::uint32 counter;
     public:
         // _numBases: Number of interleaved independent sequences in [1,32].
-        HaltonRng(uint32 _numBases = 1);
+        HaltonRng(ei::uint32 _numBases = 1);
 
-        uint32 operator () ();
+        ei::uint32 operator () ();
     };
 
     // Medium speed Quasi-RNG.
@@ -217,13 +217,13 @@ namespace cn {
     // permutation to increase independence of more bases.
     class HaltonRevRng
     {
-        uint32 numBases;
-        uint32 counter;
+        ei::uint32 numBases;
+        ei::uint32 counter;
     public:
         // _numBases: Number of interleaved independent sequences in [1,32].
-        HaltonRevRng(uint32 _numBases = 1);
+        HaltonRevRng(ei::uint32 _numBases = 1);
 
-        uint32 operator () ();
+        ei::uint32 operator () ();
     };
 
     // Fast Quasi-RNG.
@@ -235,15 +235,15 @@ namespace cn {
     // Gap-Variance: 1.79e-11
     class AdditiveRecurrenceRng
     {
-        uint32 numBases;
-        uint32 counter;
+        ei::uint32 numBases;
+        ei::uint32 counter;
         // Bases are computed as (2^32-1) * frac(sqrt(<Prime>))
-        static const uint32 BASES[8];
+        static const ei::uint32 BASES[8];
     public:
         // _numBases: Number of interleaved independent sequences in [1,8].
-        AdditiveRecurrenceRng(uint32 _numBases = 1);
+        AdditiveRecurrenceRng(ei::uint32 _numBases = 1);
 
-        uint32 operator () ();
+        ei::uint32 operator () ();
     };
 
     // Medium speed Quasi-RNG. The Hammersley set is very similar to the Halton
@@ -256,16 +256,16 @@ namespace cn {
     // Gap-Variance: 1.19e-20
     class HammersleyRng
     {
-        uint32 numBases;
-        uint32 numSamples;
-        uint32 counter;
+        ei::uint32 numBases;
+        ei::uint32 numSamples;
+        ei::uint32 counter;
         static const int BASES[8];
     public:
         // _numBases: number of independent dimensions
         // _numSamples: number of samples per dimension
-        HammersleyRng(uint32 _numBases, uint32 _numSamples);
+        HammersleyRng(ei::uint32 _numBases, ei::uint32 _numSamples);
 
-        uint32 operator () ();
+        ei::uint32 operator () ();
     };
 
     // http://www.deltaquants.com/sobol-sequence-simplified
@@ -285,27 +285,27 @@ namespace cn {
     class KnuthHash
     {
     public:
-        uint32 operator () (uint32) const;
+        ei::uint32 operator () (ei::uint32) const;
     };
 
     // Avalanche: 0.82, 0.92, 0.97
     class WangHash
     {
     public:
-        uint32 operator () (uint32) const;
+        ei::uint32 operator () (ei::uint32) const;
     };
 
     // Avalanche: 0.90, 0.94, 0.95
     class JenkinsHash
     {
     public:
-        uint32 operator () (uint32) const;
+        ei::uint32 operator () (ei::uint32) const;
     };
 
     // Generate an unpredictable seed from different physical states.
     // This method is considered relatively slow and high quality.
     // It includes time(), clock(), thread-id and memory allocation states.
     // This method guarantees to not output 0.
-    uint32 generateSeed();
+    ei::uint32 generateSeed();
 
 } // namespace cn
