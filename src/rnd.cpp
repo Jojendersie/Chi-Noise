@@ -292,11 +292,11 @@ namespace cn {
         // The allocation addes another cross application variance.
         void* x = malloc(1);
         free(x);
-        auto prnd = reinterpret_cast<details::Int<sizeof(void*)>::utype>(x);
+        auto prnd = reinterpret_cast<ei::details::Int<sizeof(void*)>::utype>(x);
         ei::uint32 tid = ei::uint32(std::hash<std::thread::id>()(std::this_thread::get_id()));
         ei::uint32 seed = ei::uint32(time(nullptr) + clock() + tid + prnd);
         while(seed == 0)
-            seed = ei::uint32(time(nullptr) + clock() + tid + prnd + (prnd>>32));
+            seed = ei::uint32(time(nullptr) + clock() + tid + prnd + (ei::uint64(prnd)>>32ull));
         return seed;
     }
 
