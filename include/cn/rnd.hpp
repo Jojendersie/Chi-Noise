@@ -302,6 +302,39 @@ namespace cn {
         ei::uint32 operator () (ei::uint32) const;
     };
 
+    // 32 bit Finalizer of MurmurHash3
+    // According to https://nullprogram.com/blog/2018/07/31/ this is among the best 32 bit hash function.
+    // Avalanche: 0.9208, 0.9715, 0.9924
+    class Murmur32Hash
+    {
+    public:
+        ei::uint32 operator () (ei::uint32) const;
+    };
+
+    // The best 32 bit hash with 2 multiplies and 3 xorshifts (same perf as MurmurHash3).
+    // See https://nullprogram.com/blog/2018/07/31/.
+    // Avalance: 0.9249, 0.9722, 0.9928
+    class ProspectorHash
+    {
+    public:
+        ei::uint32 operator () (ei::uint32) const;
+    };
+
+    // Like ProspectorHash, but uses one further round of multiply-xor-shift (-> less biased).
+    // Avalance: 0.9249, 0.9720, 0.9926
+    class ProspectorXHash
+    {
+    public:
+        ei::uint32 operator () (ei::uint32) const;
+    };
+
+    // 64 bit finalizer of Splitmix 64 rng.
+    class Splitmix64Hash
+    {
+    public:
+        ei::uint64 operator () (ei::uint64) const;
+    };
+
     // Generate an unpredictable seed from different physical states.
     // This method is considered relatively slow and high quality.
     // It includes time(), clock(), thread-id and memory allocation states.

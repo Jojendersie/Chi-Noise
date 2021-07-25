@@ -198,6 +198,9 @@ void test_generators()
     std::cout << "Avalanche for KnuthHash is: " << avalanche(KnuthHash(), 128) << ", " << avalanche(KnuthHash(), 1024) << ", " << avalanche(KnuthHash(), 16384) << '\n';
     std::cout << "Avalanche for WangHash is: " << avalanche(WangHash(), 128) << ", " << avalanche(WangHash(), 1024) << ", " << avalanche(WangHash(), 16384) << '\n';
     std::cout << "Avalanche for JenkinsHash is: " << avalanche(JenkinsHash(), 128) << ", " << avalanche(JenkinsHash(), 1024) << ", " << avalanche(JenkinsHash(), 16384) << '\n';
+    std::cout << "Avalanche for Murmur32Hash is: " << avalanche(Murmur32Hash(), 128) << ", " << avalanche(Murmur32Hash(), 1024) << ", " << avalanche(Murmur32Hash(), 16384) << '\n';
+    std::cout << "Avalanche for ProspectorHash is: " << avalanche(ProspectorHash(), 128) << ", " << avalanche(ProspectorHash(), 1024) << ", " << avalanche(ProspectorHash(), 16384) << '\n';
+    std::cout << "Avalanche for ProspectorXHash is: " << avalanche(ProspectorXHash(), 128) << ", " << avalanche(ProspectorXHash(), 1024) << ", " << avalanche(ProspectorXHash(), 16384) << '\n';
 
     /*std::ofstream file;
     file.open("test.csv");

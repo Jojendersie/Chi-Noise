@@ -284,6 +284,48 @@ namespace cn {
         return _x;
     }
 
+    ei::uint32 Murmur32Hash::operator () (ei::uint32 _x) const
+    {
+        _x ^= _x >> 16;
+        _x *= 0x85ebca6bu;
+        _x ^= _x >> 13;
+        _x *= 0xc2b2ae35u;
+        _x ^= _x >> 16;
+        return _x;
+    }
+
+    ei::uint32 ProspectorHash::operator () (ei::uint32 _x) const
+    {
+        _x ^= _x >> 16;
+        _x *= 0x7feb352du;
+        _x ^= _x >> 15;
+        _x *= 0x846ca68bu;
+        _x ^= _x >> 16;
+        return _x;
+    }
+
+    ei::uint32 ProspectorXHash::operator () (ei::uint32 _x) const
+    {
+        _x ^= _x >> 17;
+        _x *= 0xed5ad4bbu;
+        _x ^= _x >> 11;
+        _x *= 0xac4c1b51u;
+        _x ^= _x >> 15;
+        _x *= 0x31848babu;
+        _x ^= _x >> 14;
+        return _x;
+    }
+
+    ei::uint64 Splitmix64Hash::operator () (ei::uint64 _x) const
+    {
+        _x ^= _x >> 30;
+        _x *= 0xbf58476d1ce4e5b9ull;
+        _x ^= _x >> 27;
+        _x *= 0x94d049bb133111ebull;
+        _x ^= _x >> 31;
+        return _x;
+    }
+
     ei::uint32 generateSeed()
     {
         // time gives some number, probably in seconds. Clock is added to give some
