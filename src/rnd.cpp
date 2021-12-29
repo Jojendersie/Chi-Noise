@@ -331,15 +331,15 @@ namespace cn {
         // time gives some number, probably in seconds. Clock is added to give some
         // more short time variance, but it can be very similar on each startup.
         // The thread ID makes sure different seeds at the same time across threads differ.
-        // The allocation addes another cross application variance.
+        // The allocation adds another cross application variance.
         void* x = malloc(1);
         free(x);
         auto prnd = reinterpret_cast<ei::details::Int<sizeof(void*)>::utype>(x);
         ei::uint32 tid = ei::uint32(std::hash<std::thread::id>()(std::this_thread::get_id()));
-        ei::uint32 seed = ei::uint32(time(nullptr) + clock() + tid + prnd);
+        ei::uint32 seed = ei::uint32(time(nullptr) + clock() + tid + prnd + (ei::uint64(prnd)>>32ull));
         while(seed == 0)
             seed = ei::uint32(time(nullptr) + clock() + tid + prnd + (ei::uint64(prnd)>>32ull));
-        return seed;
+        return ProspectorXHash()(seed);
     }
 
 } // namespace cn
