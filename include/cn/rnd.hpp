@@ -84,6 +84,9 @@ namespace cn {
         Xorshift32Rng(ei::uint32 _seed);
 
         ei::uint32 operator () ();
+
+        ei::uint32 getState() const { return state; }
+        void setState(ei::uint32 _state) { state = _state; }
     };
 
     // Cellular automaton RNG after Wolfram's Rule 30.
@@ -119,9 +122,12 @@ namespace cn {
     {
         ei::uint32 state[2];
     public:
-         MwcRng(ei::uint32 _seed);
+        MwcRng(ei::uint32 _seed);
 
-         ei::uint32 operator () ();
+        ei::uint32 operator () ();
+
+        ei::uint64 getState() const { return *reinterpret_cast<const ei::uint64*>(state); }
+        void setState(ei::uint64 _state) { *reinterpret_cast<ei::uint64*>(state) = _state; }
     };
 
     // Complementary-multiply-with-carry RNG after Marsaglia.
@@ -204,6 +210,9 @@ namespace cn {
         HaltonRng(ei::uint32 _numBases = 1);
 
         ei::uint32 operator () ();
+
+        ei::uint32 getState() const { return counter; }
+        void setState(ei::uint32 _state) { counter = _state; }
     };
 
     // Medium speed Quasi-RNG.
@@ -224,6 +233,9 @@ namespace cn {
         HaltonRevRng(ei::uint32 _numBases = 1);
 
         ei::uint32 operator () ();
+
+        ei::uint32 getState() const { return counter; }
+        void setState(ei::uint32 _state) { counter = _state; }
     };
 
     // Fast Quasi-RNG.
@@ -244,6 +256,9 @@ namespace cn {
         AdditiveRecurrenceRng(ei::uint32 _numBases = 1);
 
         ei::uint32 operator () ();
+
+        ei::uint32 getState() const { return counter; }
+        void setState(ei::uint32 _state) { counter = _state; }
     };
 
     // Medium speed Quasi-RNG. The Hammersley set is very similar to the Halton
